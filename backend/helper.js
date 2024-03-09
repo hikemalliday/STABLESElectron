@@ -22,7 +22,7 @@ export const getCharNamesFromUi = (eqDir) => {
   }
 }
 
-export const processFileLineByLineSync = (name, rawInventoryFile) => {
+export const processFileLineByLineSync = (name, rawInventoryFile, createdDate) => {
   const processedFile = []
   const lines = rawInventoryFile.split(/\r?\n/) // Split by newline characters
 
@@ -31,10 +31,11 @@ export const processFileLineByLineSync = (name, rawInventoryFile) => {
     let line = lines[i]
     line = line.split(/\t/) // Assuming tab-delimited data
     line.push(name)
+    line.push(createdDate)
     processedFile.push(line) // Process each line here
   }
 
-  console.log('Synchronous file processing completed.')
+  //console.log('Synchronous file processing completed.')
   return processedFile
 }
 
@@ -42,23 +43,37 @@ export const parseInventoryFiles = (namesArray, eqDir) => {
   const processedFiles = []
 
   for (let i = 0; i < namesArray.length; i++) {
-    // First look for `${filePath}-Inventory`, then remove name from 'namesArray'
     const name = namesArray[i]
-
-    const filePathLong = `${eqDir}${name}-Inventory`
+    const filePathLong = `${eqDir}${name}-Inventory.txt`
     const filePathShort = `${eqDir}${name}`
-    if (!fs.existsSync(filePath)) {
-      console.log(`File ${filePath} does not exist.`)
-
+    // Check if filePathLong exists
+    if (filePathLong) {
+    }
+    if (!fs.existsSync(filePathShort) && !fs.existsSync(filePathLong)) {
+      //console.log(`File ${filePath} does not exist.`)
       namesArray.splice(i, 1)
       i--
       continue
     }
     try {
-      let fileContents = fs.readFileSync(filePath, 'utf-8')
-      if (fileContents) {
-        const processedFile = processFileLineByLineSync(name, fileContents)
-        processedFiles.push(processedFile)
+      if (fs.existsSync(filePathLong)) {
+        console.log('filePathLong exists')
+        let fileContentsLong = fs.readFileSync(filePathLong, 'utf-8')
+        if (fileContentsLong) {
+          const stats = fs.statSync(filePathLong)
+          const createdDate = stats.birthtime.toLocaleString()
+          const processedFile = processFileLineByLineSync(name, fileContentsLong, createdDate)
+          processedFiles.push(processedFile)
+        }
+      } else if (fs.existsSync(filePathShort)) {
+        let fileContentsShort = fs.readFileSync(filePathShort, 'utf-8')
+        if (fileContentsShort) {
+          console.log('file contents short file exists')
+          const stats = fs.statSync(filePathShort)
+          const createdDate = stats.birthtime.toLocaleString()
+          const processedFile = processFileLineByLineSync(name, fileContentsShort, createdDate)
+          processedFiles.push(processedFile)
+        }
       }
     } catch (err) {
       console.log('parseInventoryFiles (err) block')

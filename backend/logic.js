@@ -37,12 +37,12 @@ export const getEqDir = () => {
 }
 
 export const parseItems = (eqDir) => {
-  const currentDate = new Date()
+  //const currentDate = new Date()
   //TODO: Refactor to read text file, probably in a helper 'getFileDate()'
-  const month = String(currentDate.getMonth() + 1).padStart(2, '0') // Month (0-indexed, hence the +1)
-  const day = String(currentDate.getDate()).padStart(2, '0') // Day
-  const year = currentDate.getFullYear() // Full year
-  const formattedDate = `${month}-${day}-${year}`
+  // const month = String(currentDate.getMonth() + 1).padStart(2, '0') // Month (0-indexed, hence the +1)
+  // const day = String(currentDate.getDate()).padStart(2, '0') // Day
+  // const year = currentDate.getFullYear() // Full year
+  // const formattedDate = `${month}-${day}-${year}`
 
   const files = fullInventoryParse(eqDir)
   if (files) {
@@ -64,8 +64,8 @@ export const parseItems = (eqDir) => {
     dbObject.db.transaction(() => {
       files.forEach((file) => {
         file.forEach((row) => {
-          if (row.length === 6) {
-            insertData.run(row[0], row[1], row[2], row[3], row[4], row[5], formattedDate)
+          if (row.length === 7) {
+            insertData.run(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
           }
         })
       })
