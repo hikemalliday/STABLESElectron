@@ -35,7 +35,6 @@ export const processFileLineByLineSync = (name, rawInventoryFile, createdDate) =
     processedFile.push(line) // Process each line here
   }
 
-  //console.log('Synchronous file processing completed.')
   return processedFile
 }
 
@@ -50,7 +49,6 @@ export const parseInventoryFiles = (namesArray, eqDir) => {
     if (filePathLong) {
     }
     if (!fs.existsSync(filePathShort) && !fs.existsSync(filePathLong)) {
-      //console.log(`File ${filePath} does not exist.`)
       namesArray.splice(i, 1)
       i--
       continue
