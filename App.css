@@ -21,12 +21,12 @@
 }
 
 .logo:hover {
-  color: #12347d;
+  color: rgb(21, 255, 130);
   cursor: pointer;
 }
 
 .logo:active {
-  color: #1b4bb3;
+  color: rgb(114, 255, 180);
   cursor: pointer;
 }
 
@@ -40,7 +40,6 @@
   align-items: flex-end;
   margin-bottom: 4px;
   width: 50%;
-
 }
 
 .header-main-container {
@@ -56,6 +55,7 @@
   top: 0;
   left: 0;
   margin: 0;
+
   text-transform: uppercase;
 }
 
@@ -90,9 +90,9 @@
 }
 
 .sub-header {
-  background-color: #3d3d3d;
+  background-color: #141414;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   position: fixed;
   width: 100%;
   height: 25px;
@@ -102,10 +102,30 @@
   text-transform: uppercase;
 }
 
+.views-select {
+  display: flex;
+}
+
+.view-option {
+  color: rgba(97, 97, 97, 0.867);
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.view-option:hover {
+  color: rgb(21, 255, 130);
+  cursor: pointer;
+}
+
+.view-option:active {
+  color: rgb(145, 255, 197);
+  cursor: pointer;
+}
+
 .table-container {
   display: flex;
   justify-content: center;
-  margin-top: 50px;
+  margin-top: 75px;
   margin-left: 100px;
   margin-right: 100px;
   flex-direction: column;
@@ -123,7 +143,7 @@
   font-weight: bold; /* Make header text bold */
 }
 
-tbody tr:nth-child(odd){
+tbody tr:nth-child(odd) {
   background-color: #1e1e1e;
 }
 
@@ -158,7 +178,3 @@ tbody tr:active {
 .button {
   text-align: center;
 }
-
-
-
-

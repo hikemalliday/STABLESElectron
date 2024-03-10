@@ -26,7 +26,7 @@ export const CharactersDropdown = () => {
         id="combo-box-demo"
         options={characterNamesArray}
         onChange={(_event, value) => handleDropdownChange(value)}
-        sx={{ width: 300 }}
+        sx={{ width: 200, marginRight: '8px' }}
         renderInput={(params) => (
           <TextField
             {...params}

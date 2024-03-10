@@ -29,6 +29,7 @@ export const ItemAndCharacterContextProvider: FC<ItemAndCharacterContextProvider
   const [characterName, setCharacterName] = useState('ALL')
   const [eqDir, setEqDir] = useState<string>('')
   const [itemSearchInput, setItemSearchInput] = useState<string>('')
+  const [activeView, setActiveView] = useState('Inventory')
   return (
     <ItemAndCharacterContext.Provider
       value={{

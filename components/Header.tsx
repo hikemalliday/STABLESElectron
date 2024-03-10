@@ -4,6 +4,7 @@ import CharactersDropdown from './CharactersDropdown'
 import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
 import { parseItems } from '../fetches'
 import { getCharNames } from '../helper'
+import { SubHeader } from './SubHeader'
 
 export const Header = () => {
   // @ts-ignore
@@ -21,6 +22,7 @@ export const Header = () => {
       setCharacterNamesArray(getCharNames(results))
     }
   }
+
   return (
     <>
       <div className="header-main-container">
@@ -36,6 +38,7 @@ export const Header = () => {
           <div className="header-button" onClick={() => handleParseClick()}>
             PARSE
           </div>
+          <SubHeader />
         </div>
       </div>
     </>
