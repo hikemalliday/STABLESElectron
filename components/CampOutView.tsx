@@ -1,23 +1,20 @@
 import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
 import { useEffect, useMemo, useState } from 'react'
 import { getCharNames } from '../helper'
-import { getItems, fetchEqDir } from '../fetches'
+import { getCampOut, fetchEqDir } from '../fetches'
 import { Button } from '@mui/material'
 import { useTable, usePagination } from 'react-table'
 import { sortColumn } from '../helper'
 
-export const InventoryView = () => {
+export const CampOutView = () => {
   const [sortDirections, setSortDirections] = useState({
-    itemName: false,
-    itemLocation: false,
     charName: false,
-    itemId: false,
-    itemCount: false,
+    campOutLocation: false,
     timeStamp: false
   })
 
   // @ts-ignore
-  const { itemsArray, setItemsArray, setItemsCharacterNamesArray, setEqDir } =
+  const { itemsArray, campOutArray, setCampOutArray, setCampOutCharacterNamesArray, setEqDir } =
     useItemAndCharacterContext()
 
   const sortTable = (colName: string, array: object[]) => {
@@ -26,16 +23,13 @@ export const InventoryView = () => {
       [colName]: !prevSortDirections[colName]
     }))
     const sortedColumn = sortColumn(colName, array, sortDirections[colName])
-    setItemsArray(sortedColumn)
+    setCampOutArray(sortedColumn)
   }
 
   const columns = useMemo(
     () => [
-      { Header: 'itemName', accessor: 'itemName' },
-      { Header: 'itemLocation', accessor: 'itemLocation' },
       { Header: 'charName', accessor: 'charName' },
-      { Header: 'itemId', accessor: 'itemId' },
-      { Header: 'itemCount', accessor: 'itemCount' },
+      { Header: 'campOutLocation', accessor: 'campOutLocation' },
       { Header: 'timeStamp', accessor: 'timeStamp' }
     ],
     []
@@ -56,7 +50,7 @@ export const InventoryView = () => {
   } = useTable(
     {
       columns,
-      data: itemsArray,
+      data: campOutArray,
       initialState: { pageIndex: 0, pageSize: 100 }
     },
     usePagination
@@ -71,16 +65,15 @@ export const InventoryView = () => {
         setEqDir(eqDirFetch)
       }
 
-      const results = await getItems({
-        itemName: '',
+      const results = await getCampOut({
         charName: 'ALL'
       })
       if (results) {
-        setItemsArray(results)
+        setCampOutArray(results)
 
         const names = getCharNames(results)
         if (names) {
-          setItemsCharacterNamesArray(names)
+          setCampOutCharacterNamesArray(names)
         }
       }
     })()
@@ -119,7 +112,7 @@ export const InventoryView = () => {
                 {headerGroup.headers.map((column) => (
                   <th
                     {...column.getHeaderProps()}
-                    onClick={() => sortTable(column.render('Header'), itemsArray)}
+                    onClick={() => sortTable(column.render('Header'), campOutArray)}
                   >
                     {column.render('Header')}
                   </th>

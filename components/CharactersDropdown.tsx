@@ -1,30 +1,75 @@
 import { Autocomplete, TextField } from '@mui/material'
 import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
-import { useEffect } from 'react'
-import { getItems } from '../fetches'
+
+import { getItems, getSpells, getCampOut } from '../fetches'
 
 export const CharactersDropdown = () => {
-  // @ts-ignore
-  const { itemSearchInput, setItemsArray, characterNamesArray, setCharacterName } =
-    useItemAndCharacterContext()
+  const {
+    // @ts-ignore
+    itemSearchInput,
+    // @ts-ignore
+    setItemsArray,
+    // @ts-ignore
+    setSpellsArray,
+    // @ts-ignore
+    setCampOutArray,
+    // @ts-ignore
+    itemsCharacterNamesArray,
+    // @ts-ignore
+    spellsCharacterNamesArray,
+    // @ts-ignore
+    campOutCharacterNamesArray,
+    // @ts-ignore
+    setCharacterName,
+    // @ts-ignore
+    activeView
+  } = useItemAndCharacterContext()
 
-  const handleDropdownChange = async (charName) => {
-    setCharacterName(charName)
-    const results = await getItems({ charName: charName, itemName: itemSearchInput })
-    if (results) {
-      setItemsArray(results)
+  const getCharacterNamesArray = () => {
+    switch (activeView) {
+      case 'Inventory':
+        return itemsCharacterNamesArray
+      case 'Spells':
+        return spellsCharacterNamesArray
+      case 'Camp Out':
+        return campOutCharacterNamesArray
+      default:
+        return []
     }
   }
 
-  useEffect(() => {
-    console.log(`characterNamesArray: ${characterNamesArray}`)
-  }, [])
+  const handleDropdownChange = async (charName) => {
+    setCharacterName(charName)
+    switch (activeView) {
+      case 'Inventory':
+        const itemsResults = await getItems({ charName: charName, itemName: itemSearchInput })
+        if (itemsResults) {
+          setItemsArray(itemsResults)
+        }
+        break
+      case 'Spells':
+        const spellsResults = await getSpells({ charName: charName })
+        if (spellsResults) {
+          setSpellsArray(spellsResults)
+        }
+        break
+      case 'Camp Out':
+        const campOutResults = await getCampOut({ charName: charName })
+        if (campOutResults) {
+          setCampOutArray(campOutResults)
+        }
+        break
+      default:
+        break
+    }
+  }
+
   return (
     <div>
       <Autocomplete
         disablePortal
         id="combo-box-demo"
-        options={characterNamesArray}
+        options={getCharacterNamesArray()}
         onChange={(_event, value) => handleDropdownChange(value)}
         sx={{ width: 200, marginRight: '8px' }}
         renderInput={(params) => (
@@ -33,8 +78,7 @@ export const CharactersDropdown = () => {
             label="CHARACTER"
             variant="standard"
             InputLabelProps={{
-              // Specify styles for the label
-              style: { color: 'white', padding: 0, margin: 0 } // Change the color to red (replace "red" with your desired color)
+              style: { color: 'white', padding: 0, margin: 0 }
             }}
             sx={{
               input: {
@@ -42,7 +86,7 @@ export const CharactersDropdown = () => {
                 padding: '0',
                 fontSize: 'smaller',
                 display: 'flex',
-                alignItems: 'flex-end' // Align text to the bottom
+                alignItems: 'flex-end'
               }
             }}
           />

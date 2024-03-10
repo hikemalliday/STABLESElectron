@@ -1,21 +1,40 @@
 import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
 
 export const SubHeader = () => {
+  //@ts-ignore
+  const { activeView, setActiveView } = useItemAndCharacterContext()
+
   const setInventoryView = () => {
-    console.log('Set Inventory View')
+    setActiveView('Inventory')
   }
   const setCampoutView = () => {
-    console.log('Set Campout View')
+    setActiveView('Camp Out')
   }
   const setSpellsView = () => {
-    console.log('Set Spells View')
+    setActiveView('Spells')
   }
+  //<Link to="/" onClick={() => handleLinkClick('home')} className={activeLink === 'home' ? 'active' : ''}>Home</Link>
   return (
     <div className="sub-header">
       <div className="views-select">
-        <div className="view-option">INVENTORY</div>
-        <div className="view-option">SPELLS</div>
-        <div className="view-option">CAMP OUT</div>
+        <div
+          className={activeView === 'Inventory' ? 'view-option clicked' : 'view-option'}
+          onClick={setInventoryView}
+        >
+          INVENTORY
+        </div>
+        <div
+          className={activeView === 'Spells' ? 'view-option clicked' : 'view-option'}
+          onClick={setSpellsView}
+        >
+          SPELLS
+        </div>
+        <div
+          className={activeView === 'Camp Out' ? 'view-option clicked' : 'view-option'}
+          onClick={setCampoutView}
+        >
+          CAMP OUT
+        </div>
       </div>
     </div>
   )

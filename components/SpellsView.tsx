@@ -1,23 +1,21 @@
 import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
 import { useEffect, useMemo, useState } from 'react'
 import { getCharNames } from '../helper'
-import { getItems, fetchEqDir } from '../fetches'
+import { getSpells, fetchEqDir } from '../fetches'
 import { Button } from '@mui/material'
 import { useTable, usePagination } from 'react-table'
 import { sortColumn } from '../helper'
 
-export const InventoryView = () => {
+export const SpellsView = () => {
   const [sortDirections, setSortDirections] = useState({
-    itemName: false,
-    itemLocation: false,
+    spellName: false,
+    spellLevel: false,
     charName: false,
-    itemId: false,
-    itemCount: false,
     timeStamp: false
   })
 
   // @ts-ignore
-  const { itemsArray, setItemsArray, setItemsCharacterNamesArray, setEqDir } =
+  const { itemsArray, spellsArray, setSpellsArray, setSpellsCharacterNamesArray, setEqDir } =
     useItemAndCharacterContext()
 
   const sortTable = (colName: string, array: object[]) => {
@@ -26,16 +24,14 @@ export const InventoryView = () => {
       [colName]: !prevSortDirections[colName]
     }))
     const sortedColumn = sortColumn(colName, array, sortDirections[colName])
-    setItemsArray(sortedColumn)
+    setSpellsArray(sortedColumn)
   }
 
   const columns = useMemo(
     () => [
-      { Header: 'itemName', accessor: 'itemName' },
-      { Header: 'itemLocation', accessor: 'itemLocation' },
+      { Header: 'spellName', accessor: 'spellName' },
+      { Header: 'spellLevel', accessor: 'spellLevel' },
       { Header: 'charName', accessor: 'charName' },
-      { Header: 'itemId', accessor: 'itemId' },
-      { Header: 'itemCount', accessor: 'itemCount' },
       { Header: 'timeStamp', accessor: 'timeStamp' }
     ],
     []
@@ -56,7 +52,7 @@ export const InventoryView = () => {
   } = useTable(
     {
       columns,
-      data: itemsArray,
+      data: spellsArray,
       initialState: { pageIndex: 0, pageSize: 100 }
     },
     usePagination
@@ -71,16 +67,15 @@ export const InventoryView = () => {
         setEqDir(eqDirFetch)
       }
 
-      const results = await getItems({
-        itemName: '',
+      const results = await getSpells({
         charName: 'ALL'
       })
       if (results) {
-        setItemsArray(results)
+        setSpellsArray(results)
 
         const names = getCharNames(results)
         if (names) {
-          setItemsCharacterNamesArray(names)
+          setSpellsCharacterNamesArray(names)
         }
       }
     })()
@@ -119,7 +114,7 @@ export const InventoryView = () => {
                 {headerGroup.headers.map((column) => (
                   <th
                     {...column.getHeaderProps()}
-                    onClick={() => sortTable(column.render('Header'), itemsArray)}
+                    onClick={() => sortTable(column.render('Header'), spellsArray)}
                   >
                     {column.render('Header')}
                   </th>
