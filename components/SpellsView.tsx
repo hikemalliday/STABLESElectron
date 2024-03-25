@@ -1,6 +1,6 @@
 import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
 import { useEffect, useMemo, useState } from 'react'
-import { getCharNames } from '../helper'
+import { getCharNames, getClassNames } from '../helper'
 import { getSpells, fetchEqDir } from '../fetches'
 import { Button } from '@mui/material'
 import { useTable, usePagination } from 'react-table'
@@ -15,7 +15,7 @@ export const SpellsView = () => {
   })
 
   // @ts-ignore
-  const { itemsArray, spellsArray, setSpellsArray, setSpellsCharacterNamesArray, setEqDir } =
+  const { itemsArray, spellsArray, setSpellsArray, setSpellsCharacterNamesArray, setSpellsCharacterClassesArray, setEqDir, characterClass, characterName } =
     useItemAndCharacterContext()
 
   const sortTable = (colName: string, array: object[]) => {
@@ -32,6 +32,7 @@ export const SpellsView = () => {
       { Header: 'spellName', accessor: 'spellName' },
       { Header: 'spellLevel', accessor: 'spellLevel' },
       { Header: 'charName', accessor: 'charName' },
+      { Header: 'charClass', accessor: 'charClass' },
       { Header: 'timeStamp', accessor: 'timeStamp' }
     ],
     []
@@ -66,16 +67,20 @@ export const SpellsView = () => {
       if (eqDirFetch) {
         setEqDir(eqDirFetch)
       }
-
+      
       const results = await getSpells({
-        charName: 'ALL'
+        charName: 'All',
+        charClass: 'ALL',
+        spellName: '',
       })
       if (results) {
         setSpellsArray(results)
 
         const names = getCharNames(results)
+        const classes = getClassNames(results)
         if (names) {
           setSpellsCharacterNamesArray(names)
+          setSpellsCharacterClassesArray(classes)
         }
       }
     })()

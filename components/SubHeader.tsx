@@ -1,37 +1,59 @@
 import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
+import { getCharNames, getClassNames } from '../helper'
+import { getSpells, getItems, getCampOut } from '@renderer/fetches'
 
 export const SubHeader = () => {
   //@ts-ignore
-  const { activeView, setActiveView } = useItemAndCharacterContext()
+  const { activeView, setActiveView, itemsArray, spellsArray, campOutArray, setItemsCharacterNamesArray, setItemsCharacterClassesArray, setSpellsCharacterClassesArray, setSpellsCharacterNamesArray, setCampOutCharacterClassesArray, setCampOutCharacterNamesArray } = useItemAndCharacterContext()
 
-  const setInventoryView = () => {
+  const handleInventoryViewClick = async () => {
     setActiveView('Inventory')
+    const resp = await getItems({itemName: '', charName: 'All', charClass: 'All'})
+    const names = getCharNames(resp)
+    const classes = getClassNames(resp)
+    if (resp) {
+      setItemsCharacterNamesArray(names)
+      setItemsCharacterClassesArray(classes)
+    }
   }
-  const setCampoutView = () => {
+  const handleCampoutViewClick = async () => {
     setActiveView('Camp Out')
+    const resp = await getCampOut({charName: 'All', charClass: 'All'})
+    const names = getCharNames(resp)
+    const classes = getClassNames(resp)
+    if (resp) {
+      setCampOutCharacterNamesArray(names)
+      setCampOutCharacterClassesArray(classes)
+    }
   }
-  const setSpellsView = () => {
+  const handleSpellsViewClick = async () => {
     setActiveView('Spells')
+    const resp = await getSpells({charName: 'All', charClass: 'All', spellName: ''})
+    const names = getCharNames(resp)
+    const classes = getClassNames(resp)
+    if (resp) {
+      setSpellsCharacterNamesArray(names)
+      setSpellsCharacterClassesArray(classes)
+    }
   }
-  //<Link to="/" onClick={() => handleLinkClick('home')} className={activeLink === 'home' ? 'active' : ''}>Home</Link>
   return (
     <div className="sub-header">
       <div className="views-select">
         <div
           className={activeView === 'Inventory' ? 'view-option clicked' : 'view-option'}
-          onClick={setInventoryView}
+          onClick={handleInventoryViewClick}
         >
           INVENTORY
         </div>
         <div
           className={activeView === 'Spells' ? 'view-option clicked' : 'view-option'}
-          onClick={setSpellsView}
+          onClick={handleSpellsViewClick}
         >
           SPELLS
         </div>
         <div
           className={activeView === 'Camp Out' ? 'view-option clicked' : 'view-option'}
-          onClick={setCampoutView}
+          onClick={handleCampoutViewClick}
         >
           CAMP OUT
         </div>

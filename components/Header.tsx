@@ -1,9 +1,10 @@
 import EqDir from './Eqdir'
-import ItemInput from './ItemInput'
+import SearchBar from './SearchBar'
 import CharactersDropdown from './CharactersDropdown'
+import ClassDropdown from './ClassDropdown'
 import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
 import { parseItems, parseSpells, parseCampOut } from '../fetches'
-import { getCharNames } from '../helper'
+import { getCharNames, getClassNames } from '../helper'
 import { SubHeader } from './SubHeader'
 
 export const Header = () => {
@@ -11,7 +12,7 @@ export const Header = () => {
     // @ts-ignore
     eqDir,
     // @ts-ignore
-    setItemSearchInput,
+    setSearchBarInput,
     // @ts-ignore
     setItemsArray,
     // @ts-ignore
@@ -25,34 +26,40 @@ export const Header = () => {
     // @ts-ignore
     setCampOutCharacterNamesArray,
     // @ts-ignore
+    setItemsCharacterClassesArray,
+    // @ts-ignore
+    setSpellsCharacterClassesArray,
+    // @ts-ignore
+    setCampOutCharacterClassesArray,
+    // @ts-ignore
     activeView
   } = useItemAndCharacterContext()
 
   const handleLogoClick = () => {
-    setItemSearchInput('')
+    setSearchBarInput('')
   }
 
   const handleParseClick = async (activeView: string) => {
     if (activeView === 'Inventory') {
-      console.log('Headers.handleParseClick.Inventory')
       const results = await parseItems(eqDir)
       if (results) {
         setItemsArray(results)
         setItemsCharacterNamesArray(getCharNames(results))
+        setItemsCharacterClassesArray(getClassNames(results))
       }
     } else if (activeView === 'Spells') {
-      console.log('Headers.handleParseClick.Spells')
       const results = await parseSpells(eqDir)
       if (results) {
         setSpellsArray(results)
         setSpellsCharacterNamesArray(getCharNames(results))
+        setSpellsCharacterClassesArray(getClassNames(results))
       }
     } else if (activeView === 'Camp Out') {
-      console.log('Headers.handleParseClick.Camp Out')
       const results = await parseCampOut(eqDir)
       if (results) {
         setCampOutArray(results)
         setCampOutCharacterNamesArray(getCharNames(results))
+        setCampOutCharacterClassesArray(getClassNames(results))
       }
     }
   }
@@ -66,8 +73,9 @@ export const Header = () => {
           </div>
           <EqDir />
         </div>
-        <ItemInput />
+        <SearchBar />
         <div className="header-buttons-container">
+          <ClassDropdown/>
           <CharactersDropdown />
           <div className="header-button" onClick={() => handleParseClick(activeView)}>
             PARSE

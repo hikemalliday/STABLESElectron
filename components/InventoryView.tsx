@@ -1,6 +1,6 @@
 import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
 import { useEffect, useMemo, useState } from 'react'
-import { getCharNames } from '../helper'
+import { getCharNames, getClassNames } from '../helper'
 import { getItems, fetchEqDir } from '../fetches'
 import { Button } from '@mui/material'
 import { useTable, usePagination } from 'react-table'
@@ -17,7 +17,7 @@ export const InventoryView = () => {
   })
 
   // @ts-ignore
-  const { itemsArray, setItemsArray, setItemsCharacterNamesArray, setEqDir } =
+  const { itemsArray, setItemsArray, setItemsCharacterNamesArray, setEqDir, setItemsCharacterClassesArray } =
     useItemAndCharacterContext()
 
   const sortTable = (colName: string, array: object[]) => {
@@ -34,6 +34,7 @@ export const InventoryView = () => {
       { Header: 'itemName', accessor: 'itemName' },
       { Header: 'itemLocation', accessor: 'itemLocation' },
       { Header: 'charName', accessor: 'charName' },
+      { Header: 'charClass', accessor: 'charClass' },
       { Header: 'itemId', accessor: 'itemId' },
       { Header: 'itemCount', accessor: 'itemCount' },
       { Header: 'timeStamp', accessor: 'timeStamp' }
@@ -73,14 +74,17 @@ export const InventoryView = () => {
 
       const results = await getItems({
         itemName: '',
-        charName: 'ALL'
+        charClass: 'ALL',
+        charName: 'ALL',
       })
       if (results) {
         setItemsArray(results)
 
         const names = getCharNames(results)
+        const classes = getClassNames(results)
         if (names) {
           setItemsCharacterNamesArray(names)
+          setItemsCharacterClassesArray(classes)
         }
       }
     })()

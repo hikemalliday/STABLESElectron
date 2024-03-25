@@ -13,6 +13,17 @@ export const getCharNames = (results: charObject[]) => {
   return charNames
 }
 
+export const getClassNames = (results: any[]) => {
+  const charClassesSet: Set<string> = new Set()
+  for (const char of results) {
+    charClassesSet.add(char['charClass'])
+  }
+  const classNames: string[] = Array.from(charClassesSet)
+  classNames.sort();
+  classNames.unshift('ALL')
+  return classNames
+}
+
 export const sortColumn = (colName: string, array: object[], ascending: boolean = true) => {
   // Make a copy of the array using the spread operator
   const newArray = [...array]

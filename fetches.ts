@@ -3,13 +3,17 @@ import axios from 'axios'
 interface IItemsParams {
   itemName: string
   charName: string
+  charClass: string
 }
 interface ISpellsParams {
   charName: string
+  charClass: string
+  spellName: string
 }
 
 interface ICampOutParams {
   charName: string
+  charClass: string
 }
 
 function titleCase(str: string) {
@@ -21,15 +25,28 @@ function titleCase(str: string) {
 export async function getItems(params: IItemsParams) {
   if (params['itemName']) params['itemName'] = titleCase(params['itemName'])
   if (params['charName']) params['charName'] = titleCase(params['charName'])
+  if (params['charClass']) params['charClass'] = titleCase(params['charClass'])
   const url = 'http://127.0.0.1:3000/getItems/'
   const queryParams = new URLSearchParams({
     itemName: params['itemName'],
-    charName: params['charName']
+    charName: params['charName'],
+    charClass: params['charClass'],
   })
   const fullUrl = `${url}?${queryParams}`
+  // console.log(fullUrl)
+  // console.log(fullUrl)
+  // console.log(fullUrl)
+  // console.log(fullUrl)
+  // console.log(fullUrl)
+  // console.log(fullUrl)
+  // console.log(fullUrl)
+  // console.log(fullUrl)
+  // console.log(fullUrl)
+  // console.log(fullUrl)
+  // console.log(fullUrl)
   try {
     const response = await axios.get(fullUrl)
-    if (response) {
+    if (response.data.payload) {
       return response.data.payload
     }
   } catch (error) {
@@ -40,11 +57,18 @@ export async function getItems(params: IItemsParams) {
 
 export async function getSpells(params: ISpellsParams) {
   if (params['charName']) params['charName'] = titleCase(params['charName'])
+  if (params['charClass']) params['charClass'] = titleCase(params['charClass'])
+  if (params['spellName']) params['spellName'] = titleCase(params['spellName'])
+  console.log('fetches.getSpells test')
   const url = 'http://127.0.0.1:3000/getSpells/'
   const queryParams = new URLSearchParams({
-    charName: params['charName']
+    charName: params['charName'],
+    charClass: params['charClass'],
+    spellName: params['spellName'],
   })
   const fullUrl = `${url}?${queryParams}`
+  console.log(fullUrl)
+  
   try {
     const response = await axios.get(fullUrl)
     if (response) {
@@ -58,9 +82,11 @@ export async function getSpells(params: ISpellsParams) {
 // Do we actually need this?
 export async function getCampOut(params: ICampOutParams) {
   if (params['charName']) params['charName'] = titleCase(params['charName'])
+  if (params['charClass']) params['charClass'] = titleCase(params['charClass'])
   const url = 'http://127.0.0.1:3000/getCampOut/'
   const queryParams = new URLSearchParams({
-    charName: params['charName']
+    charName: params['charName'],
+    charClass: params['charClass'],
   })
   const fullUrl = `${url}?${queryParams}`
   try {
@@ -148,3 +174,27 @@ export async function fetchEqDir() {
     throw err
   }
 }
+
+// DELETE WHEN DONE
+// We only used this to test the setChar helper backend
+// export async function testCharClass(eqDir) {
+//   const url = 'http://127.0.0.1:3000/charClass/'
+//   const queryParams = new URLSearchParams({
+//     eqDir: eqDir,
+//     charName: 'Grixus',
+//     charClass: 'Necromancer',
+//   })
+
+//   const fullUrl = `${url}?${queryParams}`
+  
+//   try {
+//     const response = await axios.post(fullUrl)
+//     if (response) {
+//       console.log(`fetches.ts.testCharClass reponse: ${response.data.payload}`)
+//       return response.data.payload
+//     }
+//   } catch (err) {
+//     console.error('Error fetching testCharClass:', err)
+//     throw err
+//   }
+// }

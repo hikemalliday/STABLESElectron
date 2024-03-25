@@ -3,8 +3,10 @@ import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
 
 import { getItems, getSpells, getCampOut } from '../fetches'
 
-export const CharactersDropdown = () => {
+export const ClassDropdown = () => {
   const {
+    // @ts-ignore
+    characterName,
     // @ts-ignore
     searchBarInput,
     // @ts-ignore
@@ -20,43 +22,51 @@ export const CharactersDropdown = () => {
     // @ts-ignore
     campOutCharacterNamesArray,
     // @ts-ignore
+    itemsCharacterClassesArray,
+    // @ts-ignore
+    spellsCharacterClassesArray,
+    // @ts-ignore
+    campOutCharacterClassesArray,
+    // @ts-ignore
     setCharacterName,
     // @ts-ignore
-    activeView,
+    setCharacterClass,
     // @ts-ignore
-    characterClass,
+    className,
+    // @ts-ignore
+    activeView
   } = useItemAndCharacterContext()
 
-  const getCharacterNamesArray = () => {
+  const getCharacterClassesArray = () => {
     switch (activeView) {
       case 'Inventory':
-        return itemsCharacterNamesArray
+        return itemsCharacterClassesArray
       case 'Spells':
-        return spellsCharacterNamesArray
+        return spellsCharacterClassesArray
       case 'Camp Out':
-        return campOutCharacterNamesArray
+        return campOutCharacterClassesArray
       default:
         return []
     }
   }
 
-  const handleDropdownChange = async (charName) => {
-    setCharacterName(charName)
+  const handleDropdownChange = async (className) => {
+    setCharacterClass(className)
     switch (activeView) {
       case 'Inventory':
-        const itemsResults = await getItems({ charName: charName, charClass: characterClass, itemName: searchBarInput, })
+        const itemsResults = await getItems({ charName: characterName, charClass: className, itemName: searchBarInput, })
         if (itemsResults) {
           setItemsArray(itemsResults)
         }
         break
       case 'Spells':
-        const spellsResults = await getSpells({ charName: charName, charClass: characterClass, spellName: searchBarInput, })
+        const spellsResults = await getSpells({ charName: characterName, charClass: className, spellName: searchBarInput, })
         if (spellsResults) {
           setSpellsArray(spellsResults)
         }
         break
       case 'Camp Out':
-        const campOutResults = await getCampOut({ charName: charName, charClass: characterClass, })
+        const campOutResults = await getCampOut({ charName: characterName, charClass: className, })
         if (campOutResults) {
           setCampOutArray(campOutResults)
         }
@@ -67,19 +77,19 @@ export const CharactersDropdown = () => {
   }
 
  
-
+ 
   return (
     <div>
       <Autocomplete
         disablePortal
         id="combo-box-demo"
-        options={getCharacterNamesArray()}
-        onChange={(_event, value) => handleDropdownChange(value)}
+        options={getCharacterClassesArray()}
+        onChange={(_event, value) => handleDropdownChange(value as string)}
         sx={{ width: 200, marginRight: '8px' }}
         renderInput={(params) => (
           <TextField
             {...params}
-            label="CHARACTER"
+            label="CLASS"
             variant="standard"
             InputLabelProps={{
               style: { color: 'white', padding: 0, margin: 0 }
@@ -100,4 +110,4 @@ export const CharactersDropdown = () => {
   )
 }
 
-export default CharactersDropdown
+export default ClassDropdown

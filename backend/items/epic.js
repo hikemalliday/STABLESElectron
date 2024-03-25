@@ -1,0 +1,16 @@
+export const epics = {
+    'Ragebringer': 'Rogue',
+    'Water Sprinkler of Nem Ankh':'Cleric',
+    'Nature Walkers Scimitar:':'Druid',
+    'Staff of the Serpent':'Enchanter',
+    'Orb of Mastery': 'Magician',
+    'Celestial Fists': 'Monk',
+    'Scythe of the Shadowed Soul': 'Necromancer',
+    'Spear of Fate': 'Shaman',
+    'Staff of the Four': 'Wizard',
+    'Singing Short Sword': 'Bard',
+    "Innoruuk's Curse": "Shadowknight",
+    "Swiftwind": "Ranger",
+    "Red Scabbard": "Warrior",
+    "Fiery Defender": "Paladin",
+}

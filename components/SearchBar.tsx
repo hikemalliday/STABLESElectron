@@ -3,12 +3,12 @@ import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
 
 import { getItems, getSpells, getCampOut } from '../fetches'
 
-export function ItemSearch() {
+export function SearchBar() {
   const {
     // @ts-ignore
-    itemSearchInput,
+    searchBarInput,
     // @ts-ignore
-    setItemSearchInput,
+    setSearchBarInput,
     // @ts-ignore
     characterName,
     // @ts-ignore
@@ -18,28 +18,34 @@ export function ItemSearch() {
     // @ts-ignore
     setCampOutArray,
     // @ts-ignore
-    activeView
+    activeView,
+    // @ts-ignore
+    characterClass,
   } = useItemAndCharacterContext()
   const handleEnter = async (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       if (activeView === 'Inventory') {
         const results = await getItems({
           charName: characterName,
-          itemName: itemSearchInput
+          itemName: searchBarInput,
+          charClass: characterClass,
         })
         if (results) {
           setItemsArray(results)
         }
       } else if (activeView === 'Spells') {
         const results = await getSpells({
-          charName: characterName
+          charName: characterName,
+          charClass: characterClass,
+          spellName: searchBarInput,
         })
         if (results) {
           setSpellsArray(results)
         }
       } else if (activeView === 'Camp Out') {
         const results = await getCampOut({
-          charName: characterName
+          charName: characterName,
+          charClass: characterClass,
         })
         if (results) {
           setCampOutArray(results)
@@ -52,10 +58,10 @@ export function ItemSearch() {
     <div className="item-input">
       <Input
         fullWidth
-        value={itemSearchInput}
-        onChange={(e) => setItemSearchInput(e.target.value)}
-        defaultValue="Item Search"
-        placeholder="Item Search"
+        value={searchBarInput}
+        onChange={(e) => setSearchBarInput(e.target.value)}
+        defaultValue="Search"
+        placeholder="Search"
         sx={{ input: { color: 'white', padding: '0' } }}
         onKeyDown={handleEnter}
       />
@@ -63,4 +69,4 @@ export function ItemSearch() {
   )
 }
 
-export default ItemSearch
+export default SearchBar

@@ -4,7 +4,6 @@ import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
 export function EqDir() {
   // @ts-ignore
 
-  //const { eqDir, setEqDir } = useItemAndCharacterContext()
   const { eqDir, setEqDir } = useItemAndCharacterContext()
 
   return (

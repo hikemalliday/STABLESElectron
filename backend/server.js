@@ -1,7 +1,16 @@
 import express from 'express'
-import { getEqDir, getItems, parseItems, setEqDir } from './logic.js'
+import {
+  getEqDir,
+  getItems,
+  getCampOut,
+  parseItems,
+  parseCampedOut,
+  parseSpells,
+  setEqDir,
+  getSpells
+} from './logic.js'
 import cors from 'cors'
-import { doesEqDirExist } from './database.js'
+import { doesEqDirExist, dropTableCampOut } from './database.js'
 import { dbObject } from './databaseObject.js'
 
 export const startExpressServer = () => {
@@ -15,7 +24,6 @@ export const startExpressServer = () => {
     try {
       if (exists === true) {
         const eqDir = getEqDir()
-
         res.json({ message: 'EqDir acquired successfully.', payload: eqDir })
       } else {
         res.json({ message: 'Error: /getEqDir' })
@@ -44,7 +52,7 @@ export const startExpressServer = () => {
     const success = parseItems(eqDir)
     if (success === true) {
       setEqDir(eqDir)
-      const payload = getItems('All', '')
+      const payload = getItems('All', '', 'All')
       if (payload) {
         res.json({ message: 'Success', payload: payload })
       }
@@ -52,10 +60,58 @@ export const startExpressServer = () => {
   })
 
   app.get('/getItems', (req, res) => {
-    const { charName, itemName } = req.query
+    const { charName, itemName, charClass } = req.query
     try {
-      const payload = getItems(charName, itemName)
-      res.status(200).json({ message: 'data received successfully', payload: payload })
+      const payload = getItems(charName, itemName, charClass)
+      if (payload) {
+        // console.log(payload)
+        res.status(200).json({ message: 'items get successful.', payload: payload })
+      }
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
+  })
+
+  app.post('/parseCampOut', async (req, res) => {
+    const { eqDir } = req.query
+    const success = parseCampedOut(eqDir)
+    if (success === true) {
+      setEqDir(eqDir)
+      const payload = getCampOut('All', 'All')
+      if (payload) res.json({ message: 'Camp out parse success', payload: payload })
+    }
+  })
+
+  app.get('/getCampOut', async (req, res) => {
+    const { charName, charClass } = req.query
+    try {
+      const payload = getCampOut(charName, charClass)
+      if (payload) {
+        res.status(200).json({ message: 'camp out get successful', payload: payload })
+      }
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
+  })
+
+  app.post('/parseSpells', async (req, res) => {
+    console.log('/parseSpells test, server endpoint')
+    const { eqDir } = req.query
+    const success = parseSpells(eqDir)
+    if (success === true) {
+      setEqDir(eqDir)
+      const payload = getSpells('All', 'All', '')
+      if (payload) res.json({ message: 'Spells parse success', payload: payload })
+    }
+  })
+
+  app.get('/getSpells', async (req, res) => {
+    const { charName, charClass, spellName } = req.query
+    try {
+      const payload = getSpells(charName, charClass, spellName)
+      if (payload) {
+        res.status(200).json({ message: 'spells get sucessful', payload: payload })
+      }
     } catch (error) {
       res.status(500).json({ error: error.message })
     }
@@ -74,5 +130,5 @@ process.on('exit', () => {
 process.on('uncaughtException', (err) => {
   console.error('Uncaught exception:', err)
   dbObject.db.close()
-  process.exit(1) // Exit the process with a failure code
+  process.exit(1) 
 })

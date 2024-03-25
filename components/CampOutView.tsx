@@ -1,6 +1,6 @@
 import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
 import { useEffect, useMemo, useState } from 'react'
-import { getCharNames } from '../helper'
+import { getCharNames, getClassNames } from '../helper'
 import { getCampOut, fetchEqDir } from '../fetches'
 import { Button } from '@mui/material'
 import { useTable, usePagination } from 'react-table'
@@ -9,12 +9,12 @@ import { sortColumn } from '../helper'
 export const CampOutView = () => {
   const [sortDirections, setSortDirections] = useState({
     charName: false,
-    campOutLocation: false,
+    location: false,
     timeStamp: false
   })
 
   // @ts-ignore
-  const { itemsArray, campOutArray, setCampOutArray, setCampOutCharacterNamesArray, setEqDir } =
+  const { itemsArray, campOutArray, setCampOutArray, setCampOutCharacterNamesArray, setEqDir, setCampOutCharacterClassesArray } =
     useItemAndCharacterContext()
 
   const sortTable = (colName: string, array: object[]) => {
@@ -29,7 +29,8 @@ export const CampOutView = () => {
   const columns = useMemo(
     () => [
       { Header: 'charName', accessor: 'charName' },
-      { Header: 'campOutLocation', accessor: 'campOutLocation' },
+      { Header: 'charClass', accessor: 'charClass' },
+      { Header: 'location', accessor: 'location' },
       { Header: 'timeStamp', accessor: 'timeStamp' }
     ],
     []
@@ -66,14 +67,17 @@ export const CampOutView = () => {
       }
 
       const results = await getCampOut({
-        charName: 'ALL'
+        charName: 'ALL',
+        charClass: 'ALL',
       })
       if (results) {
         setCampOutArray(results)
 
         const names = getCharNames(results)
+        const classes = getClassNames(results)
         if (names) {
           setCampOutCharacterNamesArray(names)
+          setCampOutCharacterClassesArray(classes)
         }
       }
     })()

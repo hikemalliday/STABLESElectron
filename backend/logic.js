@@ -1,5 +1,11 @@
-import { createInventoryTable, createEqDirTable } from './database.js'
-import { fullInventoryParse } from './helper.js'
+import {
+  createInventoryTable,
+  createEqDirTable,
+  createCampOutTable,
+  createSpellsTable
+} from './database.js'
+import { createCharClassMap } from './helper.js'
+import { fullInventoryParse, fullSpellsParse, fullCampOutParse } from './parse.js'
 import { dbObject } from './databaseObject.js'
 
 export const setEqDir = (eqDir) => {
@@ -37,35 +43,29 @@ export const getEqDir = () => {
 }
 
 export const parseItems = (eqDir) => {
-  //const currentDate = new Date()
-  //TODO: Refactor to read text file, probably in a helper 'getFileDate()'
-  // const month = String(currentDate.getMonth() + 1).padStart(2, '0') // Month (0-indexed, hence the +1)
-  // const day = String(currentDate.getDate()).padStart(2, '0') // Day
-  // const year = currentDate.getFullYear() // Full year
-  // const formattedDate = `${month}-${day}-${year}`
-
   const files = fullInventoryParse(eqDir)
-  if (files) {
-    console.log(`files exists, length: ${files.length}`)
-  }
 
   createInventoryTable()
-
+  const charClasses = createCharClassMap();
   dbObject.db.exec('DELETE FROM inventory')
-  console.log('Inventory deleted.')
+  console.log('Inventory table deleted.')
   dbObject.db.exec('PRAGMA journal_mode = MEMORY')
   dbObject.db.exec('PRAGMA synchronous = OFF')
 
   const insertData = dbObject.db.prepare(
     `INSERT INTO inventory (itemLocation, itemName, itemId,
-                                itemCount, itemSlots, charName, timeStamp) VALUES (?, ?, ?, ?, ?, ?, ?)`
+                                itemCount, itemSlots, charName, timeStamp, charClass) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
   )
   try {
     dbObject.db.transaction(() => {
       files.forEach((file) => {
         file.forEach((row) => {
-          if (row.length === 7) {
-            insertData.run(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
+          if (row.length === 8) {
+            let charName = row[5]
+            if (charName in charClasses){
+              row[7] = charClasses[charName]
+            }
+            insertData.run(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
           }
         })
       })
@@ -80,30 +80,168 @@ export const parseItems = (eqDir) => {
   return true
 }
 
-export const getItems = (charName, itemName) => {
-  createInventoryTable()
+export const parseCampedOut = (eqDir) => {
+  const files = fullCampOutParse(eqDir)
 
-  let rows
+  createCampOutTable()
+
+  dbObject.db.exec('DELETE FROM campout')
+  console.log('Camp out table deleted.')
+  dbObject.db.exec('PRAGMA journal_mode = MEMORY')
+  dbObject.db.exec('PRAGMA synchronous = OFF')
+
+  const insertData = dbObject.db.prepare(
+    `INSERT INTO campout (charClass, charName, location, timeStamp) VALUES (?, ?, ?, ?)`
+  )
   try {
-    if (charName === 'All') {
-      if (itemName === '') {
-        rows = dbObject.db.prepare('SELECT * FROM inventory').all()
-      } else {
-        rows = dbObject.db
-          .prepare('SELECT * FROM inventory WHERE itemName LIKE ?')
-          .all(`%${itemName}%`)
-      }
+    dbObject.db.transaction(() => {
+      files.forEach((row) => {
+        if (row.length === 4) {
+          insertData.run(row[0], row[1], row[2], row[3])
+        }
+      })
+    })()
+  } catch (err) {
+    console.error('Error while inserting data:', err)
+    throw err // Propagate the error
+  } finally {
+    dbObject.db.exec('PRAGMA synchronous = FULL')
+    dbObject.db.exec('PRAGMA journal_mode = WAL')
+  }
+  return true
+}
+
+export const parseSpells = (eqDir) => {
+  const files = fullSpellsParse(eqDir)
+  createSpellsTable()
+
+  dbObject.db.exec('DELETE FROM spells')
+  console.log('Spells table deleted.')
+  dbObject.db.exec('PRAGMA journal_mode = MEMORY')
+  dbObject.db.exec('PRAGMA synchronous = OFF')
+
+  const insertData = dbObject.db.prepare(
+    `INSERT INTO spells (spellLevel, spellName, charName, timeStamp, charClass) VALUES (?, ?, ?, ?, ?)`
+  )
+  try {
+    dbObject.db.transaction(() => {
+      files.forEach((file) => {
+        file.forEach((row) => {
+          if (row.length === 5) {
+            insertData.run(row[0], row[1], row[2], row[3], row[4])
+          }
+        })
+      })
+    })()
+  } catch (err) {
+    console.error('Error while inserting data:', err)
+    throw err // Propagate the error
+  } finally {
+    dbObject.db.exec('PRAGMA synchronous = FULL')
+    dbObject.db.exec('PRAGMA journal_mode = WAL')
+  }
+  return true
+}
+// Need to update the endpoint, as the frontend payload
+export const getSpells = (charName, charClass, spellName) => {
+  createSpellsTable()
+  let rows
+  // Filters are charClass and charName
+  // charName != 'all' && charClass !== 'all'
+  try {
+    if (charName !== 'All' && charClass != 'All') {
+        console.log('logic.getSpells.all condition')
+        rows = dbObject.db.prepare(`SELECT * FROM spells 
+                                  WHERE charName = ? 
+                                  AND charClass = ? 
+                                  AND spellName LIKE ?`)
+                                  .all(charName, charClass, `%${spellName}%`)
+    } else if (charName != 'All' && charClass == 'All'){
+      console.log('logic.getSpells.charName !=="all" && charClass == "all" condition')
+        rows = dbObject.db.prepare(`SELECT * FROM spells 
+                                  WHERE charName = ? 
+                                  AND spellName LIKE ?`).all(charName, `%${spellName}%`)  
+    } else if (charName == 'All' && charClass != 'All') {
+      console.log('logic.getSpells.charName =="all" && charClass !== "all" condition')
+        rows = dbObject.db.prepare(`SELECT * FROM spells 
+                                    WHERE charClass = ? 
+                                    AND spellName LIKE ?`).all(charClass, `%${spellName}%`) 
     } else {
-      if (itemName === '') {
-        rows = dbObject.db.prepare('SELECT * FROM inventory WHERE charName = ?').all(charName)
-      } else {
-        rows = dbObject.db
-          .prepare('SELECT * FROM inventory WHERE charName = ? AND itemName LIKE ?')
-          .all(charName, `%${itemName}%`)
-      }
+      console.log('logic.getSpells.charName == "all" && charClass == "all" condition')
+      rows = dbObject.db.prepare(`SELECT * FROM spells
+                                  WHERE spellName LIKE?`).all(`%${spellName}%`)
     }
     return rows
   } catch (error) {
     return { error: error.message }
+  }
+}
+
+export const getItems = (charName, itemName, charClass) => {
+  createInventoryTable()
+  let rows
+  try {
+    if (charName === 'All' && charClass === 'All' ){
+      console.log('charName = All, charClass = All')
+      rows = dbObject.db.prepare('SELECT * FROM inventory WHERE itemName LIKE ?').all(`%${itemName}%`)
+    }
+    else if (charName !== 'All' && charClass === 'All') {
+      console.log('charName != All, charClass = All')
+      rows = dbObject.db
+        .prepare('SELECT * FROM inventory WHERE charName = ? AND itemName LIKE ?')
+        .all(charName, `%${itemName}%`)
+    } 
+    else if (charName === 'All' && charClass !== 'All'){
+      console.log('charName = All, charClass != All')
+      rows = dbObject.db
+        .prepare('SELECT * FROM inventory WHERE charClass = ? AND itemName LIKE ?')
+        .all(charClass, `%${itemName}%`)
+    }
+    else if (charName !== 'All' && charClass !== 'All'){
+      console.log('charName != All, charClass != All')
+      rows = dbObject.db
+      .prepare('SELECT * FROM inventory WHERE charName = ? AND charClass = ? AND itemName LIKE ?')
+      .all(charName, charClass, `%${itemName}%`)
+    }
+    return rows
+  } catch (error) {
+    return { error: error.message }
+  }
+}
+
+export const getCampOut = (charName, charClass) => {
+  createCampOutTable()
+  // charName !== 'All' && charClass !== 'All';
+  // charName == 'All' && charClass !== 'All;
+  // charName !== 'All' && charClass == 'All';
+  // charName == 'All' && charClass == 'All';
+  let rows
+  try {
+    if (charName === 'All' && charClass === 'All' ){
+      console.log('charName = All, charClass = All')
+      rows = dbObject.db.prepare('SELECT * FROM campOut').all()
+    }
+    else if (charName !== 'All' && charClass === 'All') {
+      console.log('charName != All, charClass = All')
+      rows = dbObject.db
+        .prepare('SELECT * FROM campOut WHERE charName = ?')
+        .all(charName)
+    } 
+    else if (charName === 'All' && charClass !== 'All'){
+      console.log('charName = All, charClass != All')
+      rows = dbObject.db
+        .prepare('SELECT * FROM campOut WHERE charClass = ?')
+        .all(charClass)
+    }
+    else if (charName !== 'All' && charClass !== 'All'){
+      console.log('charName != All, charClass != All')
+      rows = dbObject.db
+      .prepare('SELECT * FROM campOut WHERE charName = ? AND charClass = ?')
+      .all(charName, charClass)
+    }
+    return rows
+  } catch (err) {
+    console.log(err)
+    return { error: err.message }
   }
 }

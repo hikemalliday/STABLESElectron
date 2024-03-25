@@ -1,4 +1,7 @@
 import fs from 'fs'
+import { spellsMaster } from './spells/classSpellsMaster'
+import { createCharClassTable } from './database'
+import { dbObject } from './databaseObject'
 
 export const getCharNamesFromUi = (eqDir) => {
   try {
@@ -17,76 +20,196 @@ export const getCharNamesFromUi = (eqDir) => {
     }
     return names
   } catch (err) {
-    //console.error(`Error reading dir: ${err}`);
-    //throw err;
+    console.error(`Error reading dir: ${err}`);
+    throw err;
   }
 }
 
-export const processFileLineByLineSync = (name, rawInventoryFile, createdDate) => {
+
+// Need to iterate over proccessed file and change UNKNOWN to proper class name:
+export const updateItemCharClass = (charName, processedFile) => {
+  for (let i = 0; i < processedFile.length; i++) {
+    let charClassElement = processedFile[i][7];
+    if (charClassElement === 'Unknown' && charName !== '') {
+      processedFile[i][7] = charName;
+    }
+  }
+}
+
+export const updateSpellCharClass = (charClass, processedFile) => {
+  for (let i = 0; i < processedFile.length; i++) {
+    const spell = processedFile[i];
+    spell.push(toTitleCase(charClass))
+  }
+}
+
+export const determineMissingSpells = (parsedSpells, charClass) => {
+  const missingSpells = []
+  let charName = ''
+  let timeStamp = ''
+  let spellLevel = 0
+  for (let spellMaster in spellsMaster[charClass]){
+    let bool = false
+    spellLevel = spellsMaster[charClass][spellMaster]
+    for (let parsedSpell of parsedSpells){
+      charName = parsedSpell[2]
+      timeStamp = parsedSpell[3]
+      let spell = parsedSpell[1]
+      if (spell === spellMaster) {
+        bool = true
+      }
+    }
+    if (bool === false){
+      missingSpells.push([spellLevel, spellMaster, charName, timeStamp])
+    }
+  }
+  return missingSpells
+}
+
+export const getCampOutLocation = (name, rawLogFile, createdDate) => {
+  let charClass = getCharClass(name);
   const processedFile = []
-  const lines = rawInventoryFile.split(/\r?\n/) // Split by newline characters
+  const zone = []
+  const regex = /\[.*\] You have entered ([^.]+)/
+  const lines = rawLogFile.split(/\r?\n/)
 
   for (let i = 0; i < lines.length; i++) {
-    if (i === 0) continue
-    let line = lines[i]
-    line = line.split(/\t/) // Assuming tab-delimited data
-    line.push(name)
-    line.push(createdDate)
-    processedFile.push(line) // Process each line here
+    const line = lines[i]
+    const match = line.match(regex)
+    if (match) {
+      zone.push(match[1])
+    }
   }
+  processedFile.push(charClass)
+  processedFile.push(name)
+  processedFile.push(zone.pop())
+  processedFile.push(createdDate)
 
   return processedFile
 }
 
-export const parseInventoryFiles = (namesArray, eqDir) => {
-  const processedFiles = []
-
-  for (let i = 0; i < namesArray.length; i++) {
-    const name = namesArray[i]
-    const filePathLong = `${eqDir}${name}-Inventory.txt`
-    const filePathShort = `${eqDir}${name}`
-    // Check if filePathLong exists
-    if (filePathLong) {
-    }
-    if (!fs.existsSync(filePathShort) && !fs.existsSync(filePathLong)) {
-      namesArray.splice(i, 1)
-      i--
-      continue
-    }
-    try {
-      if (fs.existsSync(filePathLong)) {
-        console.log('filePathLong exists')
-        let fileContentsLong = fs.readFileSync(filePathLong, 'utf-8')
-        if (fileContentsLong) {
-          const stats = fs.statSync(filePathLong)
-          const createdDate = stats.birthtime.toLocaleString()
-          const processedFile = processFileLineByLineSync(name, fileContentsLong, createdDate)
-          processedFiles.push(processedFile)
-        }
-      } else if (fs.existsSync(filePathShort)) {
-        let fileContentsShort = fs.readFileSync(filePathShort, 'utf-8')
-        if (fileContentsShort) {
-          console.log('file contents short file exists')
-          const stats = fs.statSync(filePathShort)
-          const createdDate = stats.birthtime.toLocaleString()
-          const processedFile = processFileLineByLineSync(name, fileContentsShort, createdDate)
-          processedFiles.push(processedFile)
-        }
-      }
-    } catch (err) {
-      console.log('parseInventoryFiles (err) block')
-      console.log(err)
-    }
+export const setClassPrimary = (charName, charClass) => {
+  charClass = toTitleCase(charClass)
+  try {
+    const tableExists =
+    dbObject.db
+      .prepare("SELECT count(*) as count FROM sqlite_master WHERE type='table' AND name='charClass'")
+      .get().count > 0
+  if (tableExists === false) {
+    createCharClassTable()
   }
-  return processedFiles
+  // Look for row, then delete if exists:
+  const selectQuery = dbObject.db.prepare('SELECT * FROM charClass WHERE charName = ?')
+  const rowToDelete = selectQuery.get(charName)
+
+  if (rowToDelete) {
+    const deleteQuery = dbObject.db.prepare("DELETE FROM charClass WHERE charName = ?")
+    deleteQuery.run(rowToDelete.charName)
+    console.log('charClass deleted successfully.')
+  } 
+    const insertQuery = dbObject.db.prepare("INSERT INTO charClass (charName, charClass) VALUES (?, ?)")
+    insertQuery.run(charName, charClass)
+
+  } catch (err) {
+    console.log(err);
+  }
 }
 
-export const fullInventoryParse = (eqDir) => {
+export const setClassSecondary = (charName, charClass) => {
+  charClass = toTitleCase(charClass)
   try {
-    const names = getCharNamesFromUi(eqDir)
-    const processedFiles = parseInventoryFiles(names, eqDir)
-    if (processedFiles) return processedFiles
+    const tableExists =
+    dbObject.db
+      .prepare("SELECT count(*) as count FROM sqlite_master WHERE type='table' AND name='charClass'")
+      .get().count > 0
+  if (tableExists === false) {
+    createCharClassTable()
+  }
+  // Look for row, then delete if exists:
+  const selectQuery = dbObject.db.prepare('SELECT * FROM charClass WHERE charName = ?')
+  const selectecdRow = selectQuery.get(charName)
+
+  if (selectecdRow) {
+    console.log(`CHAR CLASS for ${charName} already exists, aborting insert.`)
+    return;
+  } 
+    const insertQuery = dbObject.db.prepare("INSERT INTO charClass (charName, charClass) VALUES (?, ?)")
+    insertQuery.run(charName, charClass)
+
   } catch (err) {
-    console.error('Error:', err)
+    console.log(err);
+  }
+}
+
+export const toTitleCase = (str) => {
+  if (str === 'mage') return 'Magician'
+  return str.toLowerCase().replace(/\b\w/g, function(char) {
+    return char.toUpperCase();
+  });
+}
+
+export const createCharClassMap = () => {
+  try {
+    const classMap = {}
+    const tableExists =
+    dbObject.db
+      .prepare("SELECT count(*) as count FROM sqlite_master WHERE type='table' AND name='charClass'")
+      .get().count > 0
+  if (tableExists === false) {
+    createCharClassTable()
+  }
+  const charsQuery = dbObject.db.prepare('SELECT charClass, charName FROM charClass')
+  const chars = charsQuery.all();
+  if (chars) {
+    for (const char of chars) {
+      classMap[char.charName] = char.charClass
+    }
+  }
+  return classMap
+} catch (err) {
+  console.log(err)
+}
+}
+
+export const hasClassArmor = (itemName, classArmor) => {
+  for (const charName in classArmor) {
+    if (itemName in classArmor[charName]) {  
+      console.log(charName)
+      return charName
+    }
+  }
+}
+
+export const hasEpic = (itemName, epics) => {
+  if (itemName in epics) {
+    return epics[itemName]
+  }
+  
+}
+
+export const hasClassItemReliable = (itemName, classItemsReliable) => {
+  if (itemName in classItemsReliable) {
+    return classItemsReliable[itemName]
+  }
+  
+}
+
+export const hasClassItemUnreliable = (itemName, classItemsUnreliable) => {
+  if (itemName in classItemsUnreliable) {
+    return classItemsUnreliable[itemName]
+  }
+}
+
+export const getCharClass = (charName) => {
+  try {
+   const result = dbObject.db.prepare(`SELECT charClass FROM charClass 
+                                      WHERE charName = ?`)
+                                      .get(charName) 
+    if (result) {
+      return result.charClass
+    } else return 'Unknown'
+  } catch (err) {
+    console.log(err)
+    return 'Unknown'
   }
 }

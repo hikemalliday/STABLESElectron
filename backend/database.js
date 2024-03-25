@@ -7,6 +7,62 @@ export const updateDbConnection = () => {
   dbObject.db = new Database(`${eqDirObj['eqDir']}/master.db`)
 }
 
+export const dropTableCampOut = () => {
+  try {
+    const dropTableQuery = `
+    DROP TABLE campout`
+    dbObject.db.exec(dropTableQuery)
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+export const dropTableInventory = () => {
+  try {
+    const dropTableQuery = `
+    DROP TABLE inventory`
+    dbObject.db.exec(dropTableQuery)
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+export const createCampOutTable = () => {
+  try {
+    const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS campout (
+      id INTEGER PRIMARY KEY,
+      charName TEXT,
+      charClass TEXT,
+      location TEXT,
+      timeStamp TEXT
+    )
+    `
+    dbObject.db.exec(createTableQuery)
+    console.log('camped table created')
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+export const createSpellsTable = () => {
+  try {
+    const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS spells (
+      id INTEGER PRIMARY KEY,
+      charName TEXT,
+      charClass TEXT,
+      spellName TEXT,
+      spellLevel INTEGER,
+      timeStamp TEXT
+    )`
+    dbObject.db.exec(createTableQuery)
+    console.log('spells table created')
+  } catch (err) {
+    console.log(err)
+  }
+}
+
 export const createInventoryTable = () => {
   try {
     const createTableQuery = `
@@ -18,6 +74,7 @@ export const createInventoryTable = () => {
       itemCount INTEGER,
       itemSlots INTEGER,
       charName TEXT,
+      charClass TEXT,
       timeStamp TEXT
     )`
     dbObject.db.exec(createTableQuery)
@@ -40,6 +97,21 @@ export const createEqDirTable = () => {
   }
 }
 
+export const createCharClassTable = () => {
+  try {
+    const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS charClass (
+      charName TEXT,
+      charClass TEXT
+    )`
+    dbObject.db.exec(createTableQuery)
+    console.log('charClass table created.')
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+// Desecrated?
 export const selectAll = () => {
   const db = new Database('./master.db')
 
@@ -72,5 +144,25 @@ export const doesEqDirExist = () => {
   } catch (err) {
     console.log('Error:', err.message)
     return false
+  }
+}
+
+export const dropCharClassTable = () => {
+  try {
+    const dropTableQuery = `
+    DROP TABLE charClass`
+    dbObject.db.exec(dropTableQuery)
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+export const dropSpellsTable = () => {
+  try {
+    const dropTableQuery = `
+    DROP TABLE spells`
+    dbObject.db.exec(dropTableQuery)
+  } catch (err) {
+    console.log(err)
   }
 }
