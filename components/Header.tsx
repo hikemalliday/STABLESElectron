@@ -16,7 +16,7 @@ export const Header = () => {
     // @ts-ignore
     setItemsArray,
     // @ts-ignore
-    setSpellsArray,
+    setMissingSpellsArray,
     // @ts-ignore
     setCampOutArray,
     // @ts-ignore
@@ -47,10 +47,10 @@ export const Header = () => {
         setItemsCharacterNamesArray(getCharNames(results))
         setItemsCharacterClassesArray(getClassNames(results))
       }
-    } else if (activeView === 'Spells') {
+    } else if (activeView === 'MissingSpells') {
       const results = await parseSpells(eqDir)
       if (results) {
-        setSpellsArray(results)
+        setMissingSpellsArray(results)
         setSpellsCharacterNamesArray(getCharNames(results))
         setSpellsCharacterClassesArray(getClassNames(results))
       }

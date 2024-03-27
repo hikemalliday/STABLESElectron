@@ -1,6 +1,6 @@
 import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
 import { getCharNames, getClassNames } from '../helper'
-import { getSpells, getItems, getCampOut } from '@renderer/fetches'
+import { getMissingSpells, getItems, getCampOut } from '@renderer/fetches'
 
 export const SubHeader = () => {
   //@ts-ignore
@@ -27,8 +27,8 @@ export const SubHeader = () => {
     }
   }
   const handleSpellsViewClick = async () => {
-    setActiveView('Spells')
-    const resp = await getSpells({charName: 'All', charClass: 'All', spellName: ''})
+    setActiveView('MissingSpells')
+    const resp = await getMissingSpells({charName: 'All', charClass: 'All', spellName: ''})
     const names = getCharNames(resp)
     const classes = getClassNames(resp)
     if (resp) {
@@ -46,10 +46,10 @@ export const SubHeader = () => {
           INVENTORY
         </div>
         <div
-          className={activeView === 'Spells' ? 'view-option clicked' : 'view-option'}
+          className={activeView === 'MissingSpells' ? 'view-option clicked' : 'view-option'}
           onClick={handleSpellsViewClick}
         >
-          SPELLS
+          MISSING SPELLS
         </div>
         <div
           className={activeView === 'Camp Out' ? 'view-option clicked' : 'view-option'}

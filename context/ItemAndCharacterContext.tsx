@@ -3,8 +3,8 @@ import React, { createContext, useState, useContext, FC, ReactNode } from 'react
 export interface ItemAndCharacterContextContextValue {
   itemsArray: object[]
   setItemsArray: React.Dispatch<React.SetStateAction<object[]>>
-  spellsArray: object[]
-  setSpellsArray: React.Dispatch<React.SetStateAction<object[]>>
+  missingSpellsArray: object[]
+  setMissingSpellsArray: React.Dispatch<React.SetStateAction<object[]>>
   campOutArray: object[]
   setCampOutArray: React.Dispatch<React.SetStateAction<object[]>>
   characterName: string
@@ -15,12 +15,12 @@ export interface ItemAndCharacterContextContextValue {
   setItemsCharacterNamesArray: React.Dispatch<React.SetStateAction<string[]>>
   spellsCharacterNamesArray: string[]
   setSpellsCharacterNamesArray: React.Dispatch<React.SetStateAction<string[]>>
+  spellsCharacterClassesArray: string[]
+  setSpellsCharacterClassesArray: React.Dispatch<React.SetStateAction<string[]>>
   campOutCharacterNamesArray: string[]
   setCampOutCharacterNamesArray: React.Dispatch<React.SetStateAction<string[]>>
   itemsCharacterClassesArray: string[]
   setItemsCharacterClassesArray: React.Dispatch<React.SetStateAction<string[]>>
-  spellsCharacterClassesArray: string[]
-  setSpellsCharacterClassesArray: React.Dispatch<React.SetStateAction<string[]>>
   campOutCharacterClassesArray: string[]
   setCampOutCharacterClassesArray: React.Dispatch<React.SetStateAction<string[]>>
   eqDir: string
@@ -52,7 +52,7 @@ export const ItemAndCharacterContextProvider: FC<ItemAndCharacterContextProvider
       timeStamp: 'test'
     }
   ])
-  const [spellsArray, setSpellsArray] = useState<object[]>([{}])
+  const [missingSpellsArray, setMissingSpellsArray] = useState<object[]>([{}])
   const [campOutArray, setCampOutArray] = useState<object[]>([{}])
   const [itemsCharacterNamesArray, setItemsCharacterNamesArray] = useState<string[]>(['ALL'])
   const [spellsCharacterNamesArray, setSpellsCharacterNamesArray] = useState<string[]>(['ALL'])
@@ -70,8 +70,8 @@ export const ItemAndCharacterContextProvider: FC<ItemAndCharacterContextProvider
       value={{
         itemsArray,
         setItemsArray,
-        spellsArray,
-        setSpellsArray,
+        missingSpellsArray,
+        setMissingSpellsArray,
         campOutArray,
         setCampOutArray,
         characterName,

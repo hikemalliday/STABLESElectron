@@ -1,12 +1,12 @@
 import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
 import { useEffect, useMemo, useState } from 'react'
 import { getCharNames, getClassNames } from '../helper'
-import { getSpells, fetchEqDir } from '../fetches'
+import { getMissingSpells, fetchEqDir } from '../fetches'
 import { Button } from '@mui/material'
 import { useTable, usePagination } from 'react-table'
 import { sortColumn } from '../helper'
 
-export const SpellsView = () => {
+export const MissingSpellsView = () => {
   const [sortDirections, setSortDirections] = useState({
     spellName: false,
     spellLevel: false,
@@ -15,7 +15,7 @@ export const SpellsView = () => {
   })
 
   // @ts-ignore
-  const { itemsArray, spellsArray, setSpellsArray, setSpellsCharacterNamesArray, setSpellsCharacterClassesArray, setEqDir, characterClass, characterName } =
+  const { itemsArray, missingSpellsArray, setMissingSpellsArray, setSpellsCharacterNamesArray, setSpellsCharacterClassesArray, setEqDir, characterClass, characterName } =
     useItemAndCharacterContext()
 
   const sortTable = (colName: string, array: object[]) => {
@@ -24,7 +24,7 @@ export const SpellsView = () => {
       [colName]: !prevSortDirections[colName]
     }))
     const sortedColumn = sortColumn(colName, array, sortDirections[colName])
-    setSpellsArray(sortedColumn)
+    setMissingSpellsArray(sortedColumn)
   }
 
   const columns = useMemo(
@@ -53,7 +53,7 @@ export const SpellsView = () => {
   } = useTable(
     {
       columns,
-      data: spellsArray,
+      data: missingSpellsArray,
       initialState: { pageIndex: 0, pageSize: 100 }
     },
     usePagination
@@ -68,14 +68,15 @@ export const SpellsView = () => {
         setEqDir(eqDirFetch)
       }
       
-      const results = await getSpells({
+      const results = await getMissingSpells({
         charName: 'All',
         charClass: 'ALL',
         spellName: '',
       })
       if (results) {
-        setSpellsArray(results)
-
+        console.log("useEffect MissingSpellsView results check:")
+        setMissingSpellsArray(results)
+        console.log(missingSpellsArray)
         const names = getCharNames(results)
         const classes = getClassNames(results)
         if (names) {
@@ -119,7 +120,7 @@ export const SpellsView = () => {
                 {headerGroup.headers.map((column) => (
                   <th
                     {...column.getHeaderProps()}
-                    onClick={() => sortTable(column.render('Header'), spellsArray)}
+                    onClick={() => sortTable(column.render('Header'), missingSpellsArray)}
                   >
                     {column.render('Header')}
                   </th>

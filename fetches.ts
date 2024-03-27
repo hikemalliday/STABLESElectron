@@ -5,7 +5,7 @@ interface IItemsParams {
   charName: string
   charClass: string
 }
-interface ISpellsParams {
+interface IMIssingSpellsParams {
   charName: string
   charClass: string
   spellName: string
@@ -33,17 +33,7 @@ export async function getItems(params: IItemsParams) {
     charClass: params['charClass'],
   })
   const fullUrl = `${url}?${queryParams}`
-  // console.log(fullUrl)
-  // console.log(fullUrl)
-  // console.log(fullUrl)
-  // console.log(fullUrl)
-  // console.log(fullUrl)
-  // console.log(fullUrl)
-  // console.log(fullUrl)
-  // console.log(fullUrl)
-  // console.log(fullUrl)
-  // console.log(fullUrl)
-  // console.log(fullUrl)
+
   try {
     const response = await axios.get(fullUrl)
     if (response.data.payload) {
@@ -55,12 +45,12 @@ export async function getItems(params: IItemsParams) {
   }
 }
 
-export async function getSpells(params: ISpellsParams) {
+export async function getMissingSpells(params: IMIssingSpellsParams) {
   if (params['charName']) params['charName'] = titleCase(params['charName'])
   if (params['charClass']) params['charClass'] = titleCase(params['charClass'])
   if (params['spellName']) params['spellName'] = titleCase(params['spellName'])
-  console.log('fetches.getSpells test')
-  const url = 'http://127.0.0.1:3000/getSpells/'
+  console.log('fetches.getMissingSpells test')
+  const url = 'http://127.0.0.1:3000/getMissingSpells/'
   const queryParams = new URLSearchParams({
     charName: params['charName'],
     charClass: params['charClass'],
@@ -72,6 +62,7 @@ export async function getSpells(params: ISpellsParams) {
   try {
     const response = await axios.get(fullUrl)
     if (response) {
+      console.log(response.data.payload)
       return response.data.payload
     }
   } catch (error) {

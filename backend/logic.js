@@ -143,31 +143,31 @@ export const parseSpells = (eqDir) => {
   return true
 }
 // Need to update the endpoint, as the frontend payload
-export const getSpells = (charName, charClass, spellName) => {
+export const getMissingSpells = (charName, charClass, spellName) => {
   createSpellsTable()
   let rows
   // Filters are charClass and charName
   // charName != 'all' && charClass !== 'all'
   try {
     if (charName !== 'All' && charClass != 'All') {
-        console.log('logic.getSpells.all condition')
+        console.log('logic.getMissingSpells.all condition')
         rows = dbObject.db.prepare(`SELECT * FROM spells 
                                   WHERE charName = ? 
                                   AND charClass = ? 
                                   AND spellName LIKE ?`)
                                   .all(charName, charClass, `%${spellName}%`)
     } else if (charName != 'All' && charClass == 'All'){
-      console.log('logic.getSpells.charName !=="all" && charClass == "all" condition')
+      console.log('logic.getMissingSpells.charName !=="all" && charClass == "all" condition')
         rows = dbObject.db.prepare(`SELECT * FROM spells 
                                   WHERE charName = ? 
                                   AND spellName LIKE ?`).all(charName, `%${spellName}%`)  
     } else if (charName == 'All' && charClass != 'All') {
-      console.log('logic.getSpells.charName =="all" && charClass !== "all" condition')
+      console.log('logic.getMissingSpells.charName =="all" && charClass !== "all" condition')
         rows = dbObject.db.prepare(`SELECT * FROM spells 
                                     WHERE charClass = ? 
                                     AND spellName LIKE ?`).all(charClass, `%${spellName}%`) 
     } else {
-      console.log('logic.getSpells.charName == "all" && charClass == "all" condition')
+      console.log('logic.getMissingSpells.charName == "all" && charClass == "all" condition')
       rows = dbObject.db.prepare(`SELECT * FROM spells
                                   WHERE spellName LIKE?`).all(`%${spellName}%`)
     }

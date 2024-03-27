@@ -1,7 +1,7 @@
 import { Autocomplete, TextField } from '@mui/material'
 import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
 
-import { getItems, getSpells, getCampOut } from '../fetches'
+import { getItems, getMissingSpells, getCampOut } from '../fetches'
 
 export const CharactersDropdown = () => {
   const {
@@ -10,7 +10,7 @@ export const CharactersDropdown = () => {
     // @ts-ignore
     setItemsArray,
     // @ts-ignore
-    setSpellsArray,
+    setMissingSpellsArray,
     // @ts-ignore
     setCampOutArray,
     // @ts-ignore
@@ -31,7 +31,7 @@ export const CharactersDropdown = () => {
     switch (activeView) {
       case 'Inventory':
         return itemsCharacterNamesArray
-      case 'Spells':
+      case 'MissingSpells':
         return spellsCharacterNamesArray
       case 'Camp Out':
         return campOutCharacterNamesArray
@@ -49,10 +49,10 @@ export const CharactersDropdown = () => {
           setItemsArray(itemsResults)
         }
         break
-      case 'Spells':
-        const spellsResults = await getSpells({ charName: charName, charClass: characterClass, spellName: searchBarInput, })
+      case 'MissingSpells':
+        const spellsResults = await getMissingSpells({ charName: charName, charClass: characterClass, spellName: searchBarInput, })
         if (spellsResults) {
-          setSpellsArray(spellsResults)
+          setMissingSpellsArray(spellsResults)
         }
         break
       case 'Camp Out':

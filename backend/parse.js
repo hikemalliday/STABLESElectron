@@ -98,7 +98,7 @@ const processFileLineByLineSync = (name, logFile, createdDate) => {
     }
     return processedFile
   }
-  // TODO: Rename this to 'processInventoryFileLineByLineSync'
+// Wrapper for inventory parse
 export const fullInventoryParse = (eqDir) => {
     try {
       const names = getCharNamesFromUi(eqDir)

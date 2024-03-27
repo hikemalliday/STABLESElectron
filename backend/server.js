@@ -7,10 +7,10 @@ import {
   parseCampedOut,
   parseSpells,
   setEqDir,
-  getSpells
+  getMissingSpells
 } from './logic.js'
 import cors from 'cors'
-import { doesEqDirExist, dropTableCampOut } from './database.js'
+import { doesEqDirExist } from './database.js'
 import { dbObject } from './databaseObject.js'
 
 export const startExpressServer = () => {
@@ -100,16 +100,18 @@ export const startExpressServer = () => {
     const success = parseSpells(eqDir)
     if (success === true) {
       setEqDir(eqDir)
-      const payload = getSpells('All', 'All', '')
+      const payload = getMissingSpells('All', 'All', '')
       if (payload) res.json({ message: 'Spells parse success', payload: payload })
     }
   })
 
-  app.get('/getSpells', async (req, res) => {
+  app.get('/getMissingSpells', async (req, res) => {
+    console.log('./getMissingSpells test (server.js)')
     const { charName, charClass, spellName } = req.query
     try {
-      const payload = getSpells(charName, charClass, spellName)
+      const payload = getMissingSpells(charName, charClass, spellName)
       if (payload) {
+        console.log(payload)
         res.status(200).json({ message: 'spells get sucessful', payload: payload })
       }
     } catch (error) {
