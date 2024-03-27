@@ -76,7 +76,6 @@ export const MissingSpellsView = () => {
       if (results) {
         console.log("useEffect MissingSpellsView results check:")
         setMissingSpellsArray(results)
-        console.log(missingSpellsArray)
         const names = getCharNames(results)
         const classes = getClassNames(results)
         if (names) {

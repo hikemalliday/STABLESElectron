@@ -111,7 +111,7 @@ export const parseCampedOut = (eqDir) => {
   return true
 }
 
-export const parseSpells = (eqDir) => {
+export const parseMissingSpells = (eqDir) => {
   const files = fullSpellsParse(eqDir)
   createSpellsTable()
 

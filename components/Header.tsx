@@ -3,7 +3,7 @@ import SearchBar from './SearchBar'
 import CharactersDropdown from './CharactersDropdown'
 import ClassDropdown from './ClassDropdown'
 import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
-import { parseItems, parseSpells, parseCampOut } from '../fetches'
+import { parseItems, parseMissingSpells, parseCampOut } from '../fetches'
 import { getCharNames, getClassNames } from '../helper'
 import { SubHeader } from './SubHeader'
 
@@ -48,7 +48,7 @@ export const Header = () => {
         setItemsCharacterClassesArray(getClassNames(results))
       }
     } else if (activeView === 'MissingSpells') {
-      const results = await parseSpells(eqDir)
+      const results = await parseMissingSpells(eqDir)
       if (results) {
         setMissingSpellsArray(results)
         setSpellsCharacterNamesArray(getCharNames(results))

@@ -111,12 +111,12 @@ export async function parseItems(eqDir: string) {
   }
 }
 
-export async function parseSpells(eqDir: string) {
+export async function parseMissingSpells(eqDir: string) {
   if (!eqDir) {
     console.log('Please provide an everquest directory.')
     return
   }
-  const url = 'http://127.0.0.1:3000/parseSpells/'
+  const url = 'http://127.0.0.1:3000/parseMissingSpells/'
   const queryParams = new URLSearchParams({
     eqDir: eqDir
   })

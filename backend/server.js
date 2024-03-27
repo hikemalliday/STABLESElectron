@@ -5,7 +5,7 @@ import {
   getCampOut,
   parseItems,
   parseCampedOut,
-  parseSpells,
+  parseMissingSpells,
   setEqDir,
   getMissingSpells
 } from './logic.js'
@@ -94,14 +94,14 @@ export const startExpressServer = () => {
     }
   })
 
-  app.post('/parseSpells', async (req, res) => {
-    console.log('/parseSpells test, server endpoint')
+  app.post('/parseMissingSpells', async (req, res) => {
+    console.log('/parseMissingSpells test, server endpoint')
     const { eqDir } = req.query
-    const success = parseSpells(eqDir)
+    const success = parseMissingSpells(eqDir)
     if (success === true) {
       setEqDir(eqDir)
       const payload = getMissingSpells('All', 'All', '')
-      if (payload) res.json({ message: 'Spells parse success', payload: payload })
+      if (payload) res.json({ message: 'Missing spells parse success', payload: payload })
     }
   })
 
@@ -111,7 +111,6 @@ export const startExpressServer = () => {
     try {
       const payload = getMissingSpells(charName, charClass, spellName)
       if (payload) {
-        console.log(payload)
         res.status(200).json({ message: 'spells get sucessful', payload: payload })
       }
     } catch (error) {
