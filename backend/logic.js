@@ -2,10 +2,11 @@ import {
   createInventoryTable,
   createEqDirTable,
   createCampOutTable,
-  createSpellsTable
+  createSpellsTable,
+  createMissingSpellsTable
 } from './database.js'
 import { createCharClassMap } from './helper.js'
-import { fullInventoryParse, fullSpellsParse, fullCampOutParse } from './parse.js'
+import { fullInventoryParse, fullMissingSpellsParse, fullCampOutParse, fullSpellsParse } from './parse.js'
 import { dbObject } from './databaseObject.js'
 
 export const setEqDir = (eqDir) => {
@@ -111,17 +112,49 @@ export const parseCampedOut = (eqDir) => {
   return true
 }
 
-export const parseMissingSpells = (eqDir) => {
+export const parseSpells = (eqDir) => {
   const files = fullSpellsParse(eqDir)
   createSpellsTable()
 
   dbObject.db.exec('DELETE FROM spells')
-  console.log('Spells table deleted.')
+  console.log('spells table deleted.')
   dbObject.db.exec('PRAGMA journal_mode = MEMORY')
   dbObject.db.exec('PRAGMA synchronous = OFF')
 
   const insertData = dbObject.db.prepare(
     `INSERT INTO spells (spellLevel, spellName, charName, timeStamp, charClass) VALUES (?, ?, ?, ?, ?)`
+  )
+  try {
+    dbObject.db.transaction(() => {
+      files.forEach((file) => {
+        file.forEach((row) => {
+          if (row.length === 5) {
+            insertData.run(row[0], row[1], row[2], row[3], row[4])
+          }
+        })
+      })
+    })()
+  } catch (err) {
+    console.error('Error while inserting spells data:', err)
+    throw err // Propagate the error
+  } finally {
+    dbObject.db.exec('PRAGMA synchronous = FULL')
+    dbObject.db.exec('PRAGMA journal_mode = WAL')
+  }
+  return true
+}
+
+export const parseMissingSpells = (eqDir) => {
+  const files = fullMissingSpellsParse(eqDir)
+  createMissingSpellsTable()
+
+  dbObject.db.exec('DELETE FROM missingspells')
+  console.log('missingspells table deleted.')
+  dbObject.db.exec('PRAGMA journal_mode = MEMORY')
+  dbObject.db.exec('PRAGMA synchronous = OFF')
+
+  const insertData = dbObject.db.prepare(
+    `INSERT INTO missingspells (spellLevel, spellName, charName, timeStamp, charClass) VALUES (?, ?, ?, ?, ?)`
   )
   try {
     dbObject.db.transaction(() => {
@@ -144,31 +177,31 @@ export const parseMissingSpells = (eqDir) => {
 }
 // Need to update the endpoint, as the frontend payload
 export const getMissingSpells = (charName, charClass, spellName) => {
-  createSpellsTable()
+  createMissingSpellsTable()
   let rows
   // Filters are charClass and charName
   // charName != 'all' && charClass !== 'all'
   try {
     if (charName !== 'All' && charClass != 'All') {
         console.log('logic.getMissingSpells.all condition')
-        rows = dbObject.db.prepare(`SELECT * FROM spells 
+        rows = dbObject.db.prepare(`SELECT * FROM missingspells 
                                   WHERE charName = ? 
                                   AND charClass = ? 
                                   AND spellName LIKE ?`)
                                   .all(charName, charClass, `%${spellName}%`)
     } else if (charName != 'All' && charClass == 'All'){
       console.log('logic.getMissingSpells.charName !=="all" && charClass == "all" condition')
-        rows = dbObject.db.prepare(`SELECT * FROM spells 
+        rows = dbObject.db.prepare(`SELECT * FROM missingspells 
                                   WHERE charName = ? 
                                   AND spellName LIKE ?`).all(charName, `%${spellName}%`)  
     } else if (charName == 'All' && charClass != 'All') {
       console.log('logic.getMissingSpells.charName =="all" && charClass !== "all" condition')
-        rows = dbObject.db.prepare(`SELECT * FROM spells 
+        rows = dbObject.db.prepare(`SELECT * FROM missingspells 
                                     WHERE charClass = ? 
                                     AND spellName LIKE ?`).all(charClass, `%${spellName}%`) 
     } else {
       console.log('logic.getMissingSpells.charName == "all" && charClass == "all" condition')
-      rows = dbObject.db.prepare(`SELECT * FROM spells
+      rows = dbObject.db.prepare(`SELECT * FROM missingspells
                                   WHERE spellName LIKE?`).all(`%${spellName}%`)
     }
     return rows
@@ -211,10 +244,6 @@ export const getItems = (charName, itemName, charClass) => {
 
 export const getCampOut = (charName, charClass) => {
   createCampOutTable()
-  // charName !== 'All' && charClass !== 'All';
-  // charName == 'All' && charClass !== 'All;
-  // charName !== 'All' && charClass == 'All';
-  // charName == 'All' && charClass == 'All';
   let rows
   try {
     if (charName === 'All' && charClass === 'All' ){

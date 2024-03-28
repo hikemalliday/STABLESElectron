@@ -5,6 +5,7 @@ import {
   getCampOut,
   parseItems,
   parseCampedOut,
+  parseSpells,
   parseMissingSpells,
   setEqDir,
   getMissingSpells
@@ -111,7 +112,31 @@ export const startExpressServer = () => {
     try {
       const payload = getMissingSpells(charName, charClass, spellName)
       if (payload) {
-        res.status(200).json({ message: 'spells get sucessful', payload: payload })
+        res.status(200).json({ message: '"Missing spells" get sucessful', payload: payload })
+      }
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
+  })
+
+  app.post('/parseSpells', async (req, res) => {
+    console.log('/parseSpells test, server endpoint')
+    const { eqDir } = req.query
+    const success = parseSpells(eqDir)
+    if (success === true) {
+      setEqDir(eqDir)
+      const payload = getSpells('All', 'All', '')
+      if (payload) res.json({ message: '"spells" parse success', payload: payload })
+    }
+  })
+
+  app.get('/getSpells', async (req, res) => {
+    console.log('./getSpells test (server.js)')
+    const { charName, charClass, spellName } = req.query
+    try {
+      const payload = getSpells(charName, charClass, spellName)
+      if (payload) {
+        res.status(200).json({ message: '"get spells" get sucessful', payload: payload })
       }
     } catch (error) {
       res.status(500).json({ error: error.message })

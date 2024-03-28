@@ -45,6 +45,24 @@ export const createCampOutTable = () => {
   }
 }
 
+export const createMissingSpellsTable = () => {
+  try {
+    const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS missingspells (
+      id INTEGER PRIMARY KEY,
+      charName TEXT,
+      charClass TEXT,
+      spellName TEXT,
+      spellLevel INTEGER,
+      timeStamp TEXT
+    )`
+    dbObject.db.exec(createTableQuery)
+    console.log('missing spells table created')
+  } catch (err) {
+    console.log(err)
+  }
+}
+
 export const createSpellsTable = () => {
   try {
     const createTableQuery = `

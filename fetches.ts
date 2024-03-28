@@ -5,6 +5,7 @@ interface IItemsParams {
   charName: string
   charClass: string
 }
+
 interface IMIssingSpellsParams {
   charName: string
   charClass: string
@@ -57,12 +58,9 @@ export async function getMissingSpells(params: IMIssingSpellsParams) {
     spellName: params['spellName'],
   })
   const fullUrl = `${url}?${queryParams}`
-  console.log(fullUrl)
-  
   try {
     const response = await axios.get(fullUrl)
     if (response) {
-      console.log(response.data.payload)
       return response.data.payload
     }
   } catch (error) {
@@ -70,7 +68,7 @@ export async function getMissingSpells(params: IMIssingSpellsParams) {
     throw error
   }
 }
-// Do we actually need this?
+
 export async function getCampOut(params: ICampOutParams) {
   if (params['charName']) params['charName'] = titleCase(params['charName'])
   if (params['charClass']) params['charClass'] = titleCase(params['charClass'])
@@ -165,27 +163,3 @@ export async function fetchEqDir() {
     throw err
   }
 }
-
-// DELETE WHEN DONE
-// We only used this to test the setChar helper backend
-// export async function testCharClass(eqDir) {
-//   const url = 'http://127.0.0.1:3000/charClass/'
-//   const queryParams = new URLSearchParams({
-//     eqDir: eqDir,
-//     charName: 'Grixus',
-//     charClass: 'Necromancer',
-//   })
-
-//   const fullUrl = `${url}?${queryParams}`
-  
-//   try {
-//     const response = await axios.post(fullUrl)
-//     if (response) {
-//       console.log(`fetches.ts.testCharClass reponse: ${response.data.payload}`)
-//       return response.data.payload
-//     }
-//   } catch (err) {
-//     console.error('Error fetching testCharClass:', err)
-//     throw err
-//   }
-// }

@@ -109,7 +109,7 @@ export const fullInventoryParse = (eqDir) => {
     }
   }
 
-  export const parseSpellsFiles = (namesArray, eqDir) => {
+export const parseMissingSpellsFiles = (namesArray, eqDir) => {
     const processedFiles = []
     for (let i = 0; i < namesArray.length; i++) {
       const name = namesArray[i]
@@ -125,7 +125,38 @@ export const fullInventoryParse = (eqDir) => {
           if (fileContents) {
             const stats = fs.statSync(filePath)
             const createdDate = stats.birthtime.toLocaleString()
-            const processedFile = processSpellFileLineByLine(name, fileContents, createdDate)
+            // Boolean to determine if we want to check fir "missing" spells or not
+            const processedFile = processSpellFileLineByLine(name, fileContents, createdDate, false)
+            processedFiles.push(processedFile)
+          }
+        }
+      } catch (err) {
+        console.log('parseMissingSpellsFiles (err) block')
+        console.log(err)
+      }
+    }
+    return processedFiles
+  }
+  
+// WIP
+export const parseSpellsFiles = (namesArray, eqDir) => {
+    const processedFiles = []
+    for (let i = 0; i < namesArray.length; i++) {
+      const name = namesArray[i]
+      const filePath = `${eqDir}${name}-Spellbook.txt`
+      if (!fs.existsSync(filePath)) {
+        namesArray.splice(i, 1)
+        i--
+        continue
+      }
+      try {
+        if (fs.existsSync(filePath)) {
+          let fileContents = fs.readFileSync(filePath, 'utf-8')
+          if (fileContents) {
+            const stats = fs.statSync(filePath)
+            const createdDate = stats.birthtime.toLocaleString()
+            // Boolean to determine if we want to check fir "missing" spells or not
+            const processedFile = processSpellFileLineByLine(name, fileContents, createdDate, false)
             processedFiles.push(processedFile)
           }
         }
@@ -134,21 +165,30 @@ export const fullInventoryParse = (eqDir) => {
         console.log(err)
       }
     }
-    // console.log('parseSpellsFiles.processedFiles')
-    // console.log(processedFiles)
     return processedFiles
   }
-// Wrapper for spellsParse
-  export const fullSpellsParse = (eqDir) => {
+// Wrapper for missingSpellsParse
+  export const fullMissingSpellsParse = (eqDir) => {
     try {
       const names = getCharNamesFromUi(eqDir)
-      const processedFiles = parseSpellsFiles(names, eqDir)
+      const processedFiles = parseMissingSpellsFiles(names, eqDir)
       
       if (processedFiles) return processedFiles
     } catch (err) {
       console.error('Error:', err)
     }
   }
+
+  export const fullSpellsParse = (eqDir) => {
+    try {
+      const names = getCharNamesFromUi(eqDir)
+      const processedFiles = parseSpellsFiles(names, eqDir)
+      if (processedFiles) return processedFiles
+    } catch (err) {
+      console.error('Error:', err)
+    }
+  }
+
 
   export const parseLogFiles = (namesArray, eqDir) => {
     const processedFiles = []
@@ -190,7 +230,7 @@ export const fullInventoryParse = (eqDir) => {
     }
   }
 
-  export const processSpellFileLineByLine = (name, logFile, createdDate) => {
+  export const processSpellFileLineByLine = (name, logFile, createdDate, boolean) => {
     const classTally = {}
     const processedFile = []
     const lines = logFile.split(/\r?\n/)
@@ -198,9 +238,8 @@ export const fullInventoryParse = (eqDir) => {
     let maxTally = 0
   
     // Push line
-    const parsedSpells = []
+    let parsedSpells = []
     for (let i = 0; i < lines.length; i++) {
-      let charClass = ''
       let line = lines[i]
       line = line.split(/\t/)
       line.push(name)
@@ -225,9 +264,12 @@ export const fullInventoryParse = (eqDir) => {
         charClass = charName
       }
     }
-    let missingSpells = determineMissingSpells(parsedSpells, charClass)
+    if (boolean) {
+      parsedSpells = determineMissingSpells(parsedSpells, charClass)
+    }
     setClassPrimary(name, charClass)
-    updateSpellCharClass(charClass, missingSpells)
-    return missingSpells
+    updateSpellCharClass(charClass, parsedSpells)
+    console.log(parsedSpells)
+    return parsedSpells
   }
   
