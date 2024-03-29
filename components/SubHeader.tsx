@@ -1,6 +1,6 @@
 import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
 import { getCharNames, getClassNames } from '../helper'
-import { getMissingSpells, getItems, getCampOut } from '@renderer/fetches'
+import { getMissingSpells, getItems, getSpells, getCampOut } from '@renderer/fetches'
 
 export const SubHeader = () => {
   //@ts-ignore
@@ -26,7 +26,7 @@ export const SubHeader = () => {
       setCampOutCharacterClassesArray(classes)
     }
   }
-  const handleSpellsViewClick = async () => {
+  const handleMissingSpellsViewClick = async () => {
     setActiveView('MissingSpells')
     const resp = await getMissingSpells({charName: 'All', charClass: 'All', spellName: ''})
     const names = getCharNames(resp)
@@ -36,6 +36,20 @@ export const SubHeader = () => {
       setSpellsCharacterClassesArray(classes)
     }
   }
+
+  const handleSpellsViewClick = async () => {
+    setActiveView('Spells')
+    const resp = await getSpells({charName: 'All', charClass: 'All', spellName: ''})
+    const names = getCharNames(resp)
+    console.log(`handleSpellsViewClick.names: ${names}`)
+    const classes = getClassNames(resp)
+    console.log(`handleSpellsView.classes: ${classes}`)
+    if (resp) {
+      setSpellsCharacterNamesArray(names)
+      setSpellsCharacterClassesArray(classes)
+    }
+  }
+  
   return (
     <div className="sub-header">
       <div className="views-select">
@@ -46,8 +60,14 @@ export const SubHeader = () => {
           INVENTORY
         </div>
         <div
-          className={activeView === 'MissingSpells' ? 'view-option clicked' : 'view-option'}
+          className={activeView === 'Spells' ? 'view-option clicked' : 'view-option'}
           onClick={handleSpellsViewClick}
+        >
+          SPELLS
+        </div>
+        <div
+          className={activeView === 'MissingSpells' ? 'view-option clicked' : 'view-option'}
+          onClick={handleMissingSpellsViewClick}
         >
           MISSING SPELLS
         </div>

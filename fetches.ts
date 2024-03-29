@@ -6,7 +6,7 @@ interface IItemsParams {
   charClass: string
 }
 
-interface IMIssingSpellsParams {
+interface ISpellsParams {
   charName: string
   charClass: string
   spellName: string
@@ -46,7 +46,30 @@ export async function getItems(params: IItemsParams) {
   }
 }
 
-export async function getMissingSpells(params: IMIssingSpellsParams) {
+export async function getSpells(params: ISpellsParams) {
+  if (params['charName']) params['charName'] = titleCase(params['charName'])
+  if (params['charClass']) params['charClass'] = titleCase(params['charClass'])
+  if (params['spellName']) params['spellName'] = titleCase(params['spellName'])
+  console.log('fetches.getSpells test')
+  const url = 'http://127.0.0.1:3000/getSpells/'
+  const queryParams = new URLSearchParams({
+    charName: params['charName'],
+    charClass: params['charClass'],
+    spellName: params['spellName'],
+  })
+  const fullUrl = `${url}?${queryParams}`
+  try {
+    const response = await axios.get(fullUrl)
+    if (response) {
+      return response.data.payload
+    }
+  } catch (error) {
+    console.error('Error fetching spells:', error)
+    throw error
+  }
+}
+
+export async function getMissingSpells(params: ISpellsParams) {
   if (params['charName']) params['charName'] = titleCase(params['charName'])
   if (params['charClass']) params['charClass'] = titleCase(params['charClass'])
   if (params['spellName']) params['spellName'] = titleCase(params['spellName'])
@@ -64,7 +87,7 @@ export async function getMissingSpells(params: IMIssingSpellsParams) {
       return response.data.payload
     }
   } catch (error) {
-    console.error('Error fetching spells:', error)
+    console.error('Error fetching missing spells:', error)
     throw error
   }
 }
@@ -95,6 +118,26 @@ export async function parseItems(eqDir: string) {
     return
   }
   const url = 'http://127.0.0.1:3000/parseItems/'
+  const queryParams = new URLSearchParams({
+    eqDir: eqDir
+  })
+  const fullUrl = `${url}?${queryParams}`
+  try {
+    const response = await axios.post(fullUrl)
+
+    if (response) return response.data.payload
+  } catch (err) {
+    console.error('Error fetching items:', err)
+    throw err
+  }
+}
+
+export async function parseSpells(eqDir: string) {
+  if (!eqDir) {
+    console.log('Please provide an everquest directory.')
+    return
+  }
+  const url = 'http://127.0.0.1:3000/parseSpells/'
   const queryParams = new URLSearchParams({
     eqDir: eqDir
   })

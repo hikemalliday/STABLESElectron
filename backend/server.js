@@ -3,6 +3,7 @@ import {
   getEqDir,
   getItems,
   getCampOut,
+  getSpells,
   parseItems,
   parseCampedOut,
   parseSpells,
@@ -131,7 +132,6 @@ export const startExpressServer = () => {
   })
 
   app.get('/getSpells', async (req, res) => {
-    console.log('./getSpells test (server.js)')
     const { charName, charClass, spellName } = req.query
     try {
       const payload = getSpells(charName, charClass, spellName)

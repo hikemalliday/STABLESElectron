@@ -1,7 +1,7 @@
 import Input from '@mui/material/Input'
 import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
 
-import { getItems, getMissingSpells, getCampOut } from '../fetches'
+import { getItems, getSpells, getMissingSpells, getCampOut } from '../fetches'
 
 export function SearchBar() {
   const {
@@ -13,6 +13,8 @@ export function SearchBar() {
     characterName,
     // @ts-ignore
     setItemsArray,
+    // @ts-ignore
+    setSpellsArray,
     // @ts-ignore
     setMissingSpellsArray,
     // @ts-ignore
@@ -33,7 +35,7 @@ export function SearchBar() {
         if (results) {
           setItemsArray(results)
         }
-      } else if (activeView === 'MISSING SPELLS') {
+      } else if (activeView === 'MissingSpells') {
         const results = await getMissingSpells({
           charName: characterName,
           charClass: characterClass,
@@ -42,7 +44,17 @@ export function SearchBar() {
         if (results) {
           setMissingSpellsArray(results)
         }
-      } else if (activeView === 'Camp Out') {
+      } else if (activeView === 'Spells') {
+        const results = await getSpells({
+          charName: characterName,
+          charClass: characterClass,
+          spellName: searchBarInput,
+        })
+        if (results) {
+          setSpellsArray(results)
+        }
+      }
+      else if (activeView === 'Camp Out') {
         const results = await getCampOut({
           charName: characterName,
           charClass: characterClass,

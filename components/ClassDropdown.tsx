@@ -1,7 +1,7 @@
 import { Autocomplete, TextField } from '@mui/material'
 import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
 
-import { getItems, getMissingSpells, getCampOut } from '../fetches'
+import { getItems, getSpells, getMissingSpells, getCampOut } from '../fetches'
 
 export const ClassDropdown = () => {
   const {
@@ -11,6 +11,8 @@ export const ClassDropdown = () => {
     searchBarInput,
     // @ts-ignore
     setItemsArray,
+    // @ts-ignore
+    setSpellsArray,
     // @ts-ignore
     setMissingSpellsArray,
     // @ts-ignore
@@ -41,6 +43,8 @@ export const ClassDropdown = () => {
     switch (activeView) {
       case 'Inventory':
         return itemsCharacterClassesArray
+      case 'Spells':
+        return spellsCharacterClassesArray
       case 'MissingSpells':
         return spellsCharacterClassesArray
       case 'Camp Out':
@@ -59,10 +63,16 @@ export const ClassDropdown = () => {
           setItemsArray(itemsResults)
         }
         break
-      case 'MissingSpells':
-        const spellsResults = await getMissingSpells({ charName: characterName, charClass: className, spellName: searchBarInput, })
+      case 'Spells':
+        const spellsResults = await getSpells({ charName: characterName, charClass: className, spellName: searchBarInput, })
         if (spellsResults) {
-          setMissingSpellsArray(spellsResults)
+          setSpellsArray(spellsResults)
+        }
+        break
+      case 'MissingSpells':
+        const missingSpellsResults = await getMissingSpells({ charName: characterName, charClass: className, spellName: searchBarInput, })
+        if (spellsResults) {
+          setMissingSpellsArray(missingSpellsResults)
         }
         break
       case 'Camp Out':

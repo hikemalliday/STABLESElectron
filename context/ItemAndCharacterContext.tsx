@@ -3,6 +3,8 @@ import React, { createContext, useState, useContext, FC, ReactNode } from 'react
 export interface ItemAndCharacterContextContextValue {
   itemsArray: object[]
   setItemsArray: React.Dispatch<React.SetStateAction<object[]>>
+  spellsArray: object[]
+  setSpellsArray: React.Dispatch<React.SetStateAction<object[]>>
   missingSpellsArray: object[]
   setMissingSpellsArray: React.Dispatch<React.SetStateAction<object[]>>
   campOutArray: object[]
@@ -52,6 +54,7 @@ export const ItemAndCharacterContextProvider: FC<ItemAndCharacterContextProvider
       timeStamp: 'test'
     }
   ])
+  const [spellsArray, setSpellsArray] = useState<object[]>([{}])
   const [missingSpellsArray, setMissingSpellsArray] = useState<object[]>([{}])
   const [campOutArray, setCampOutArray] = useState<object[]>([{}])
   const [itemsCharacterNamesArray, setItemsCharacterNamesArray] = useState<string[]>(['ALL'])
@@ -70,6 +73,8 @@ export const ItemAndCharacterContextProvider: FC<ItemAndCharacterContextProvider
       value={{
         itemsArray,
         setItemsArray,
+        spellsArray,
+        setSpellsArray,
         missingSpellsArray,
         setMissingSpellsArray,
         campOutArray,
