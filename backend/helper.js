@@ -66,6 +66,21 @@ export const determineMissingSpells = (parsedSpells, charClass) => {
   return missingSpells
 }
 
+// use sepcifically to get the campout location for 'spells' insert
+export const campoutHelper = (spellFiles) => {
+  
+  for (let file of spellFiles) {
+    for (let line of file) {
+      let campOutLocation = 'unknown';
+      const charName = line[2]
+      console.log(charName)
+      const result = dbObject.db.prepare("SELECT location FROM campout WHERE charName = ?").get(charName)
+      console.log(result)
+      if (campOutLocation) line.push(campOutLocation)
+    }
+  }
+}
+
 export const getCampOutLocation = (name, rawLogFile, createdDate) => {
   let charClass = getCharClass(name);
   const processedFile = []

@@ -5,7 +5,7 @@ import {
   createSpellsTable,
   createMissingSpellsTable
 } from './database.js'
-import { createCharClassMap } from './helper.js'
+import { createCharClassMap, campoutHelper } from './helper.js'
 import { fullInventoryParse, fullMissingSpellsParse, fullCampOutParse, fullSpellsParse } from './parse.js'
 import { dbObject } from './databaseObject.js'
 
@@ -114,6 +114,8 @@ export const parseCampedOut = (eqDir) => {
 
 export const parseSpells = (eqDir) => {
   const files = fullSpellsParse(eqDir)
+  // Get the campout location:
+  campoutHelper(files)
   createSpellsTable()
 
   dbObject.db.exec('DELETE FROM spells')
@@ -122,14 +124,15 @@ export const parseSpells = (eqDir) => {
   dbObject.db.exec('PRAGMA synchronous = OFF')
 
   const insertData = dbObject.db.prepare(
-    `INSERT INTO spells (spellLevel, spellName, charName, timeStamp, charClass) VALUES (?, ?, ?, ?, ?)`
+    `INSERT INTO spells (spellLevel, spellName, charName, timeStamp, charClass, location) VALUES (?, ?, ?, ?, ?, ?)`
   )
   try {
     dbObject.db.transaction(() => {
       files.forEach((file) => {
         file.forEach((row) => {
-          if (row.length === 5) {
-            insertData.run(row[0], row[1], row[2], row[3], row[4])
+          if (row.length === 6) {
+            console.log(row)
+            insertData.run(row[0], row[1], row[2], row[3], row[4], row[5])
           }
         })
       })

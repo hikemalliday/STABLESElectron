@@ -269,7 +269,6 @@ export const parseSpellsFiles = (namesArray, eqDir) => {
     }
     setClassPrimary(name, charClass)
     updateSpellCharClass(charClass, parsedSpells)
-    console.log(parsedSpells)
     return parsedSpells
   }
   

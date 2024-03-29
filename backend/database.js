@@ -72,6 +72,7 @@ export const createSpellsTable = () => {
       charClass TEXT,
       spellName TEXT,
       spellLevel INTEGER,
+      location TEXT,
       timeStamp TEXT
     )`
     dbObject.db.exec(createTableQuery)
