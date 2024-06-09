@@ -3,11 +3,16 @@ import {
   createEqDirTable,
   createCampOutTable,
   createSpellsTable,
-  createMissingSpellsTable
+  createMissingSpellsTable,
+  createYellowTextTable
 } from './database.js'
-import { createCharClassMap, campoutHelper } from './helper.js'
-import { fullInventoryParse, fullMissingSpellsParse, fullCampOutParse, fullSpellsParse } from './parse.js'
-import { dbObject } from './databaseObject.js'
+import { fullInventoryParse, 
+  fullMissingSpellsParse,
+  fullCampOutParse, 
+  fullSpellsParse, 
+  fullYellowTextParse } from './parse.js'
+  import { dbObject } from './databaseObject.js'
+  import { createCharClassMap, campoutHelper } from './helper.js'
 
 export const setEqDir = (eqDir) => {
   const tableExists =
@@ -25,7 +30,7 @@ export const setEqDir = (eqDir) => {
       eqDirInsert.run(eqDir)
     })
     transact()
-    console.log('EqDir set successfully!')
+    //console.log('EqDir set successfully!')
   } catch (err) {
     console.log(err)
     return false
@@ -49,7 +54,7 @@ export const parseItems = (eqDir) => {
   createInventoryTable()
   const charClasses = createCharClassMap();
   dbObject.db.exec('DELETE FROM inventory')
-  console.log('Inventory table deleted.')
+  //console.log('Inventory table deleted.')
   dbObject.db.exec('PRAGMA journal_mode = MEMORY')
   dbObject.db.exec('PRAGMA synchronous = OFF')
 
@@ -87,7 +92,7 @@ export const parseCampedOut = (eqDir) => {
   createCampOutTable()
 
   dbObject.db.exec('DELETE FROM campout')
-  console.log('Camp out table deleted.')
+  //console.log('Camp out table deleted.')
   dbObject.db.exec('PRAGMA journal_mode = MEMORY')
   dbObject.db.exec('PRAGMA synchronous = OFF')
 
@@ -119,7 +124,7 @@ export const parseSpells = (eqDir) => {
   createSpellsTable()
 
   dbObject.db.exec('DELETE FROM spells')
-  console.log('spells table deleted.')
+  //console.log('spells table deleted.')
   dbObject.db.exec('PRAGMA journal_mode = MEMORY')
   dbObject.db.exec('PRAGMA synchronous = OFF')
 
@@ -131,7 +136,6 @@ export const parseSpells = (eqDir) => {
       files.forEach((file) => {
         file.forEach((row) => {
           if (row.length === 6) {
-            console.log(row)
             insertData.run(row[0], row[1], row[2], row[3], row[4], row[5])
           }
         })
@@ -152,7 +156,7 @@ export const parseMissingSpells = (eqDir) => {
   createMissingSpellsTable()
 
   dbObject.db.exec('DELETE FROM missingspells')
-  console.log('missingspells table deleted.')
+  //console.log('missingspells table deleted.')
   dbObject.db.exec('PRAGMA journal_mode = MEMORY')
   dbObject.db.exec('PRAGMA synchronous = OFF')
 
@@ -186,24 +190,24 @@ export const getSpells = (charName, charClass, spellName) => {
   // charName != 'all' && charClass !== 'all'
   try {
     if (charName !== 'All' && charClass != 'All') {
-        console.log('logic.getMissingSpells.all condition')
+        //console.log('logic.getMissingSpells.all condition')
         rows = dbObject.db.prepare(`SELECT * FROM spells 
                                   WHERE charName = ? 
                                   AND charClass = ? 
                                   AND spellName LIKE ?`)
                                   .all(charName, charClass, `%${spellName}%`)
     } else if (charName != 'All' && charClass == 'All'){
-      console.log('logic.getMissingSpells.charName !=="all" && charClass == "all" condition')
+      //console.log('logic.getMissingSpells.charName !=="all" && charClass == "all" condition')
         rows = dbObject.db.prepare(`SELECT * FROM spells 
                                   WHERE charName = ? 
                                   AND spellName LIKE ?`).all(charName, `%${spellName}%`)  
     } else if (charName == 'All' && charClass != 'All') {
-      console.log('logic.getMissingSpells.charName =="all" && charClass !== "all" condition')
+      //console.log('logic.getMissingSpells.charName =="all" && charClass !== "all" condition')
         rows = dbObject.db.prepare(`SELECT * FROM spells 
                                     WHERE charClass = ? 
                                     AND spellName LIKE ?`).all(charClass, `%${spellName}%`) 
     } else {
-      console.log('logic.getMissingSpells.charName == "all" && charClass == "all" condition')
+      //console.log('logic.getMissingSpells.charName == "all" && charClass == "all" condition')
       rows = dbObject.db.prepare(`SELECT * FROM spells
                                   WHERE spellName LIKE?`).all(`%${spellName}%`)
     }
@@ -212,6 +216,7 @@ export const getSpells = (charName, charClass, spellName) => {
     return { error: error.message }
   }
 }
+
 export const getMissingSpells = (charName, charClass, spellName) => {
   createMissingSpellsTable()
   let rows
@@ -219,24 +224,24 @@ export const getMissingSpells = (charName, charClass, spellName) => {
   // charName != 'all' && charClass !== 'all'
   try {
     if (charName !== 'All' && charClass != 'All') {
-        console.log('logic.getMissingSpells.all condition')
+        //console.log('logic.getMissingSpells.all condition')
         rows = dbObject.db.prepare(`SELECT * FROM missingspells 
                                   WHERE charName = ? 
                                   AND charClass = ? 
                                   AND spellName LIKE ?`)
                                   .all(charName, charClass, `%${spellName}%`)
     } else if (charName != 'All' && charClass == 'All'){
-      console.log('logic.getMissingSpells.charName !=="all" && charClass == "all" condition')
+      //console.log('logic.getMissingSpells.charName !=="all" && charClass == "all" condition')
         rows = dbObject.db.prepare(`SELECT * FROM missingspells 
                                   WHERE charName = ? 
                                   AND spellName LIKE ?`).all(charName, `%${spellName}%`)  
     } else if (charName == 'All' && charClass != 'All') {
-      console.log('logic.getMissingSpells.charName =="all" && charClass !== "all" condition')
+      //console.log('logic.getMissingSpells.charName =="all" && charClass !== "all" condition')
         rows = dbObject.db.prepare(`SELECT * FROM missingspells 
                                     WHERE charClass = ? 
                                     AND spellName LIKE ?`).all(charClass, `%${spellName}%`) 
     } else {
-      console.log('logic.getMissingSpells.charName == "all" && charClass == "all" condition')
+      //console.log('logic.getMissingSpells.charName == "all" && charClass == "all" condition')
       rows = dbObject.db.prepare(`SELECT * FROM missingspells
                                   WHERE spellName LIKE?`).all(`%${spellName}%`)
     }
@@ -251,27 +256,28 @@ export const getItems = (charName, itemName, charClass) => {
   let rows
   try {
     if (charName === 'All' && charClass === 'All' ){
-      console.log('charName = All, charClass = All')
+      //console.log('charName = All, charClass = All')
       rows = dbObject.db.prepare('SELECT * FROM inventory WHERE itemName LIKE ?').all(`%${itemName}%`)
     }
     else if (charName !== 'All' && charClass === 'All') {
-      console.log('charName != All, charClass = All')
+      //console.log('charName != All, charClass = All')
       rows = dbObject.db
         .prepare('SELECT * FROM inventory WHERE charName = ? AND itemName LIKE ?')
         .all(charName, `%${itemName}%`)
     } 
     else if (charName === 'All' && charClass !== 'All'){
-      console.log('charName = All, charClass != All')
+      //console.log('charName = All, charClass != All')
       rows = dbObject.db
         .prepare('SELECT * FROM inventory WHERE charClass = ? AND itemName LIKE ?')
         .all(charClass, `%${itemName}%`)
     }
     else if (charName !== 'All' && charClass !== 'All'){
-      console.log('charName != All, charClass != All')
+      //console.log('charName != All, charClass != All')
       rows = dbObject.db
       .prepare('SELECT * FROM inventory WHERE charName = ? AND charClass = ? AND itemName LIKE ?')
       .all(charName, charClass, `%${itemName}%`)
     }
+    //console.log(rows)
     return rows
   } catch (error) {
     return { error: error.message }
@@ -283,26 +289,77 @@ export const getCampOut = (charName, charClass) => {
   let rows
   try {
     if (charName === 'All' && charClass === 'All' ){
-      console.log('charName = All, charClass = All')
+      //console.log('charName = All, charClass = All')
       rows = dbObject.db.prepare('SELECT * FROM campOut').all()
     }
     else if (charName !== 'All' && charClass === 'All') {
-      console.log('charName != All, charClass = All')
+      //console.log('charName != All, charClass = All')
       rows = dbObject.db
         .prepare('SELECT * FROM campOut WHERE charName = ?')
         .all(charName)
     } 
     else if (charName === 'All' && charClass !== 'All'){
-      console.log('charName = All, charClass != All')
+      //console.log('charName = All, charClass != All')
       rows = dbObject.db
         .prepare('SELECT * FROM campOut WHERE charClass = ?')
         .all(charClass)
     }
     else if (charName !== 'All' && charClass !== 'All'){
-      console.log('charName != All, charClass != All')
+      //console.log('charName != All, charClass != All')
       rows = dbObject.db
       .prepare('SELECT * FROM campOut WHERE charName = ? AND charClass = ?')
       .all(charName, charClass)
+    }
+    return rows
+  } catch (err) {
+    console.log(err)
+    return { error: err.message }
+  }
+}
+
+export const parseYellowText = (eqDir) => {
+  const files = fullYellowTextParse(eqDir)
+  console.log(files)
+  createYellowTextTable()
+
+  dbObject.db.exec('DELETE FROM yellowtext')
+  //console.log('missingspells table deleted.')
+  dbObject.db.exec('PRAGMA journal_mode = MEMORY')
+  dbObject.db.exec('PRAGMA synchronous = OFF')
+
+  const insertData = dbObject.db.prepare(
+    `INSERT INTO yellowtext (timeStamp, victim, charName, zone) VALUES (?, ?, ?, ?)`
+  )
+  try {
+    dbObject.db.transaction(() => {
+      files.forEach((file) => {
+        file.forEach((row) => {
+          if (row.length === 4) {
+            insertData.run(row[0], row[1], row[2], row[3])
+          }
+        })
+      })
+    })()
+  } catch (err) {
+    console.error('Error while inserting data:', err)
+    throw err // Propagate the error
+  } finally {
+    dbObject.db.exec('PRAGMA synchronous = FULL')
+    dbObject.db.exec('PRAGMA journal_mode = WAL')
+  }
+  return true
+}
+
+export const getYellowText = (charName) => {
+  createYellowTextTable()
+  let rows
+  try {
+    if (charName === 'All') {
+      rows = dbObject.db.prepare("SELECT * FROM yellowtext").all()
+    }
+    else if (charName !== 'All') {
+      rows = dbObject.db.prepare("SELECT * FROM yellowtext WHERE charName = ?")
+      .all(charName)
     }
     return rows
   } catch (err) {

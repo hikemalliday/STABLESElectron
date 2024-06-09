@@ -3,7 +3,7 @@ import SearchBar from './SearchBar'
 import CharactersDropdown from './CharactersDropdown'
 import ClassDropdown from './ClassDropdown'
 import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
-import { parseItems, parseSpells, parseMissingSpells, parseCampOut } from '../fetches'
+import { parseItems, parseSpells, parseMissingSpells, parseCampOut, parseYellowText } from '../fetches'
 import { getCharNames, getClassNames } from '../helper'
 import { SubHeader } from './SubHeader'
 
@@ -34,7 +34,11 @@ export const Header = () => {
     // @ts-ignore
     setCampOutCharacterClassesArray,
     // @ts-ignore
-    activeView
+    activeView,
+    // @ts-ignore
+    setYellowTextArray,
+    // @ts-ignore
+    setYellowTextCharactersArray,
   } = useItemAndCharacterContext()
 
   const handleLogoClick = () => {
@@ -69,6 +73,12 @@ export const Header = () => {
         setCampOutArray(results)
         setCampOutCharacterNamesArray(getCharNames(results))
         setCampOutCharacterClassesArray(getClassNames(results))
+      }
+    } else if (activeView === 'Yellow Text') {
+      const results = await parseYellowText(eqDir)
+      if (results) {
+        setYellowTextArray(results)
+        setYellowTextCharactersArray(getCharNames(results))
       }
     }
   }

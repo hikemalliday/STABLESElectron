@@ -1,7 +1,7 @@
 import { Autocomplete, TextField } from '@mui/material'
 import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
 
-import { getItems, getSpells, getMissingSpells, getCampOut } from '../fetches'
+import { getItems, getSpells, getMissingSpells, getCampOut, getYellowText } from '../fetches'
 
 export const CharactersDropdown = () => {
   const {
@@ -16,6 +16,8 @@ export const CharactersDropdown = () => {
     // @ts-ignore
     setCampOutArray,
     // @ts-ignore
+    setYellowTextArray,
+    // @ts-ignore
     itemsCharacterNamesArray,
     // @ts-ignore
     spellsCharacterNamesArray,
@@ -27,6 +29,10 @@ export const CharactersDropdown = () => {
     activeView,
     // @ts-ignore
     characterClass,
+    // @ts-ignore
+    yellowTextCharactersArray,
+    // @ts-ignore
+    setYellowTextCharactersArray,
   } = useItemAndCharacterContext()
 
   const getCharacterNamesArray = () => {
@@ -39,6 +45,8 @@ export const CharactersDropdown = () => {
         return spellsCharacterNamesArray
       case 'Camp Out':
         return campOutCharacterNamesArray
+      case 'Yellow Text':
+        return yellowTextCharactersArray
       default:
         return []
     }
@@ -61,7 +69,7 @@ export const CharactersDropdown = () => {
         break
       case 'MissingSpells':
         const missingSpellsResults = await getMissingSpells({ charName: charName, charClass: characterClass, spellName: searchBarInput, })
-        if (spellsResults) {
+        if (missingSpellsResults) {
           setMissingSpellsArray(missingSpellsResults)
         }
         break
@@ -69,6 +77,12 @@ export const CharactersDropdown = () => {
         const campOutResults = await getCampOut({ charName: charName, charClass: characterClass, })
         if (campOutResults) {
           setCampOutArray(campOutResults)
+        }
+        break
+      case 'Yellow Text':
+        const yellowTextResults = await getYellowText({ charName: charName })
+        if (yellowTextResults) {
+          setYellowTextArray(yellowTextResults)
         }
         break
       default:

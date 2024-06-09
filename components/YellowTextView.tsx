@@ -1,22 +1,21 @@
 import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
 import { useEffect, useMemo, useState } from 'react'
-import { getCharNames, getClassNames } from '../helper'
-import { getSpells, fetchEqDir } from '../fetches'
+import { getCharNames } from '../helper'
+import { getYellowText, fetchEqDir } from '../fetches'
 import { Button } from '@mui/material'
 import { useTable, usePagination } from 'react-table'
 import { sortColumn } from '../helper'
 
-export const SpellsView = () => {
+export const YellowTextView = () => {
   const [sortDirections, setSortDirections] = useState({
-    spellName: false,
-    spellLevel: false,
     charName: false,
-    location: false,
+    victim: false,
+    zone: false,
     timeStamp: false
   })
 
   // @ts-ignore
-  const { itemsArray, spellsArray, setSpellsArray, setSpellsCharacterNamesArray, setSpellsCharacterClassesArray, setEqDir, characterClass, characterName } =
+  const { yellowTextArray, setYellowTextArray, setYellowTextCharactersArray, setEqDir, characterName } =
     useItemAndCharacterContext()
 
   const sortTable = (colName: string, array: object[]) => {
@@ -25,16 +24,14 @@ export const SpellsView = () => {
       [colName]: !prevSortDirections[colName]
     }))
     const sortedColumn = sortColumn(colName, array, sortDirections[colName])
-    setSpellsArray(sortedColumn)
+    setYellowTextArray(sortedColumn)
   }
 
   const columns = useMemo(
     () => [
-      { Header: 'spellName', accessor: 'spellName' },
-      { Header: 'spellLevel', accessor: 'spellLevel' },
       { Header: 'charName', accessor: 'charName' },
-      { Header: 'charClass', accessor: 'charClass' },
-      { Header: 'location', accessor: 'location' },
+      { Header: 'victim', accessor: 'victim' },
+      { Header: 'zone', accessor: 'zone' },
       { Header: 'timeStamp', accessor: 'timeStamp' },
     ],
     []
@@ -55,7 +52,7 @@ export const SpellsView = () => {
   } = useTable(
     {
       columns,
-      data: spellsArray,
+      data: yellowTextArray,
       initialState: { pageIndex: 0, pageSize: 100 }
     },
     usePagination
@@ -69,19 +66,15 @@ export const SpellsView = () => {
       if (eqDirFetch) {
         setEqDir(eqDirFetch)
       }
-      
-      const results = await getSpells({
+      const results = await getYellowText({
         charName: 'All',
-        charClass: 'ALL',
-        spellName: '',
       })
       if (results) {
-        setSpellsArray(results)
+        setYellowTextArray(results)
         const names = getCharNames(results)
-        const classes = getClassNames(results)
         if (names) {
-          setSpellsCharacterNamesArray(names)
-          setSpellsCharacterClassesArray(classes)
+          setYellowTextCharactersArray(names)
+          console.log(names)
         }
       }
     })()
@@ -120,7 +113,7 @@ export const SpellsView = () => {
                 {headerGroup.headers.map((column) => (
                   <th
                     {...column.getHeaderProps()}
-                    onClick={() => sortTable(column.render('Header'), spellsArray)}
+                    onClick={() => sortTable(column.render('Header'), yellowTextArray)}
                   >
                     {column.render('Header')}
                   </th>

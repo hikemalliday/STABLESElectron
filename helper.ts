@@ -9,6 +9,7 @@ export const getCharNames = (results: charObject[]) => {
     charNamesSet.add(char['charName'])
   }
   const charNames: string[] = Array.from(charNamesSet)
+  charNames.sort();
   charNames.unshift('ALL')
   return charNames
 }

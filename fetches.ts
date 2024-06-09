@@ -17,6 +17,10 @@ interface ICampOutParams {
   charClass: string
 }
 
+interface IYellowTextParams {
+  charName: string
+}
+
 function titleCase(str: string) {
   return str.toLowerCase().replace(/\b\w/g, function (param: string) {
     return param.toUpperCase()
@@ -50,7 +54,6 @@ export async function getSpells(params: ISpellsParams) {
   if (params['charName']) params['charName'] = titleCase(params['charName'])
   if (params['charClass']) params['charClass'] = titleCase(params['charClass'])
   if (params['spellName']) params['spellName'] = titleCase(params['spellName'])
-  console.log('fetches.getSpells test')
   const url = 'http://127.0.0.1:3000/getSpells/'
   const queryParams = new URLSearchParams({
     charName: params['charName'],
@@ -73,7 +76,6 @@ export async function getMissingSpells(params: ISpellsParams) {
   if (params['charName']) params['charName'] = titleCase(params['charName'])
   if (params['charClass']) params['charClass'] = titleCase(params['charClass'])
   if (params['spellName']) params['spellName'] = titleCase(params['spellName'])
-  console.log('fetches.getMissingSpells test')
   const url = 'http://127.0.0.1:3000/getMissingSpells/'
   const queryParams = new URLSearchParams({
     charName: params['charName'],
@@ -193,12 +195,10 @@ export async function parseCampOut(eqDir: string) {
 }
 
 export async function fetchEqDir() {
-  console.log('fetchEqDir frontend')
   const url = 'http://127.0.0.1:3000/getEqDir/'
   try {
     const response = await axios.get(url)
     if (response) {
-      console.log(`fetches.ts.fetchEqDir reponse: ${response.data.payload}`)
       return response.data.payload
     }
   } catch (err) {
@@ -206,3 +206,45 @@ export async function fetchEqDir() {
     throw err
   }
 }
+
+export async function parseYellowText(eqDir: string) {
+  if (!eqDir) {
+    console.log('Please provide an everquest directory.')
+    return
+  }
+  const url = 'http://127.0.0.1:3000/parseYellowText/'
+  const queryParams = new URLSearchParams({
+    eqDir: eqDir
+  })
+  const fullUrl = `${url}?${queryParams}`
+  try {
+    const response = await axios.post(fullUrl)
+
+    if (response) return response.data.payload
+  } catch (err) {
+    console.error('Error parsing yellow text:', err)
+    throw err
+  }
+}
+
+export async function getYellowText(params: IYellowTextParams) {
+  if (params['charName']) params['charName'] = titleCase(params['charName'])
+  const url = 'http://127.0.0.1:3000/getYellowText/'
+  const queryParams = new URLSearchParams({
+    charName: params['charName']
+  })
+  const fullUrl = `${url}?${queryParams}`
+  try {
+    const response = await axios.get(fullUrl)
+    if (response) {
+      // for (const result of response.data.payload) {
+      //   console.log(result)
+      // }
+      return response.data.payload
+    }
+  } catch (err) {
+    console.error('Error fetching yellow text:', err)
+    throw err
+  }
+}
+

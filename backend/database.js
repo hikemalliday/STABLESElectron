@@ -185,3 +185,30 @@ export const dropSpellsTable = () => {
     console.log(err)
   }
 }
+
+export const createYellowTextTable = () => {
+  try {
+    const createTableQuery = `
+    CREATE TABLE IF NOT EXISTS yellowtext (
+      id INTEGER PRIMARY KEY,
+      charName TEXT,
+      victim TEXT,
+      zone TEXT,
+      timeStamp TEXT
+    )`
+    dbObject.db.exec(createTableQuery)
+    console.log('yellowtext table created.')
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+export const dropYellowTextTable = () => {
+  try {
+    const dropTableQuery = `
+    DROP TABLE spells`
+    dbObject.db.exec(dropTableQuery)
+  } catch (err) {
+    console.log(err)
+  }
+}

@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, FC, ReactNode } from 'react'
+import React, { createContext, useState, useContext, FC, ReactNode, useEffect } from 'react'
 
 export interface ItemAndCharacterContextContextValue {
   itemsArray: object[]
@@ -7,6 +7,10 @@ export interface ItemAndCharacterContextContextValue {
   setSpellsArray: React.Dispatch<React.SetStateAction<object[]>>
   missingSpellsArray: object[]
   setMissingSpellsArray: React.Dispatch<React.SetStateAction<object[]>>
+  yellowTextArray: object[]
+  setYellowTextArray: React.Dispatch<React.SetStateAction<object[]>>
+  yellowTextCharactersArray: string[]
+  setYellowTextCharactersArray: React.Dispatch<React.SetStateAction<string[]>>
   campOutArray: object[]
   setCampOutArray: React.Dispatch<React.SetStateAction<object[]>>
   characterName: string
@@ -59,6 +63,8 @@ export const ItemAndCharacterContextProvider: FC<ItemAndCharacterContextProvider
   const [campOutArray, setCampOutArray] = useState<object[]>([{}])
   const [itemsCharacterNamesArray, setItemsCharacterNamesArray] = useState<string[]>(['ALL'])
   const [spellsCharacterNamesArray, setSpellsCharacterNamesArray] = useState<string[]>(['ALL'])
+  const [yellowTextArray, setYellowTextArray] = useState<Object[]>([{}])
+  const [yellowTextCharactersArray, setYellowTextCharactersArray] = useState<string[]>(['ALL'])
   const [campOutCharacterNamesArray, setCampOutCharacterNamesArray] = useState<string[]>(['ALL'])
   const [itemsCharacterClassesArray, setItemsCharacterClassesArray] = useState<string[]>(['ALL'])
   const [spellsCharacterClassesArray, setSpellsCharacterClassesArray] = useState<string[]>(['ALL'])
@@ -68,6 +74,7 @@ export const ItemAndCharacterContextProvider: FC<ItemAndCharacterContextProvider
   const [eqDir, setEqDir] = useState<string>('')
   const [searchBarInput, setSearchBarInput] = useState<string>('')
   const [activeView, setActiveView] = useState('Inventory')
+
   return (
     <ItemAndCharacterContext.Provider
       value={{
@@ -84,6 +91,10 @@ export const ItemAndCharacterContextProvider: FC<ItemAndCharacterContextProvider
         itemsCharacterNamesArray,
         setItemsCharacterNamesArray,
         spellsCharacterNamesArray,
+        yellowTextArray, 
+        setYellowTextArray,
+        yellowTextCharactersArray,
+        setYellowTextCharactersArray,
         setSpellsCharacterNamesArray,
         campOutCharacterNamesArray,
         setCampOutCharacterNamesArray,

@@ -3,6 +3,7 @@ import { SpellsView } from './SpellsView'
 import { MissingSpellsView } from './MissingSpellsView'
 import { CampOutView } from './CampOutView'
 import { useItemAndCharacterContext } from '@renderer/context/ItemAndCharacterContext'
+import { YellowTextView } from './YellowTextView'
 
 export const TableView = () => {
   // @ts-ignore
@@ -20,6 +21,9 @@ export const TableView = () => {
       </div>
       <div className={`view-component${activeView === 'Camp Out' ? 'active' : ''}`}>
         <CampOutView />
+      </div>
+      <div className={`view-component${activeView === 'Yellow Text' ? 'active' : ''}`}>
+        <YellowTextView />
       </div>
     </>
   )

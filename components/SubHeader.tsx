@@ -1,10 +1,10 @@
 import { useItemAndCharacterContext } from '../context/ItemAndCharacterContext'
 import { getCharNames, getClassNames } from '../helper'
-import { getMissingSpells, getItems, getSpells, getCampOut } from '@renderer/fetches'
+import { getMissingSpells, getItems, getSpells, getCampOut, getYellowText } from '@renderer/fetches'
 
 export const SubHeader = () => {
   //@ts-ignore
-  const { activeView, setActiveView, itemsArray, spellsArray, campOutArray, setItemsCharacterNamesArray, setItemsCharacterClassesArray, setSpellsCharacterClassesArray, setSpellsCharacterNamesArray, setCampOutCharacterClassesArray, setCampOutCharacterNamesArray } = useItemAndCharacterContext()
+  const { activeView, setActiveView, itemsArray, spellsArray, campOutArray, setItemsCharacterNamesArray, setItemsCharacterClassesArray, setSpellsCharacterClassesArray, setSpellsCharacterNamesArray, setCampOutCharacterClassesArray, setCampOutCharacterNamesArray, yellowTextArray, setYellowTextArray, yellowTextCharactersArray, setYellowTextCharactersArray } = useItemAndCharacterContext()
 
   const handleInventoryViewClick = async () => {
     setActiveView('Inventory')
@@ -41,12 +41,19 @@ export const SubHeader = () => {
     setActiveView('Spells')
     const resp = await getSpells({charName: 'All', charClass: 'All', spellName: ''})
     const names = getCharNames(resp)
-    console.log(`handleSpellsViewClick.names: ${names}`)
     const classes = getClassNames(resp)
-    console.log(`handleSpellsView.classes: ${classes}`)
     if (resp) {
       setSpellsCharacterNamesArray(names)
       setSpellsCharacterClassesArray(classes)
+    }
+  }
+
+  const handleYellowTextViewClick = async () => {
+    setActiveView('Yellow Text')
+    const resp = await getYellowText({ charName: 'All' })
+    const names = getCharNames(resp)
+    if (resp) {
+      setSpellsCharacterNamesArray(names)
     }
   }
   
@@ -76,6 +83,12 @@ export const SubHeader = () => {
           onClick={handleCampoutViewClick}
         >
           CAMP OUT
+        </div>
+        <div
+          className={activeView === 'Yellow Text' ? 'view-option clicked' : 'view-option'}
+          onClick={handleYellowTextViewClick}
+        >
+          YELLOW TEXT
         </div>
       </div>
     </div>

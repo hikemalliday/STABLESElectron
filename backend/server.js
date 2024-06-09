@@ -9,7 +9,9 @@ import {
   parseSpells,
   parseMissingSpells,
   setEqDir,
-  getMissingSpells
+  getMissingSpells,
+  getYellowText,
+  parseYellowText,
 } from './logic.js'
 import cors from 'cors'
 import { doesEqDirExist } from './database.js'
@@ -37,8 +39,9 @@ export const startExpressServer = () => {
 
   app.post('/setEqDir', async (req, res) => {
     const { eqDir } = req.query
+    
     try {
-      const success = setEqDir(eqDir)
+      const success = setEqDir((eqDir + "/"))
       if (success) {
         res.json({ message: 'EqDir set successfully.' })
       } else {
@@ -51,7 +54,7 @@ export const startExpressServer = () => {
 
   app.post('/parseItems', async (req, res) => {
     const { eqDir } = req.query
-    const success = parseItems(eqDir)
+    const success = parseItems((eqDir) + "/")
     if (success === true) {
       setEqDir(eqDir)
       const payload = getItems('All', '', 'All')
@@ -76,7 +79,7 @@ export const startExpressServer = () => {
 
   app.post('/parseCampOut', async (req, res) => {
     const { eqDir } = req.query
-    const success = parseCampedOut(eqDir)
+    const success = parseCampedOut((eqDir + "/"))
     if (success === true) {
       setEqDir(eqDir)
       const payload = getCampOut('All', 'All')
@@ -97,9 +100,9 @@ export const startExpressServer = () => {
   })
 
   app.post('/parseMissingSpells', async (req, res) => {
-    console.log('/parseMissingSpells test, server endpoint')
+    //console.log('/parseMissingSpells test, server endpoint')
     const { eqDir } = req.query
-    const success = parseMissingSpells(eqDir)
+    const success = parseMissingSpells((eqDir) + "/")
     if (success === true) {
       setEqDir(eqDir)
       const payload = getMissingSpells('All', 'All', '')
@@ -109,6 +112,7 @@ export const startExpressServer = () => {
 
   app.get('/getMissingSpells', async (req, res) => {
     console.log('./getMissingSpells test (server.js)')
+
     const { charName, charClass, spellName } = req.query
     try {
       const payload = getMissingSpells(charName, charClass, spellName)
@@ -121,9 +125,8 @@ export const startExpressServer = () => {
   })
 
   app.post('/parseSpells', async (req, res) => {
-    console.log('/parseSpells test, server endpoint')
     const { eqDir } = req.query
-    const success = parseSpells(eqDir)
+    const success = parseSpells((eqDir) + "/")
     if (success === true) {
       setEqDir(eqDir)
       const payload = getSpells('All', 'All', '')
@@ -140,6 +143,30 @@ export const startExpressServer = () => {
       }
     } catch (error) {
       res.status(500).json({ error: error.message })
+    }
+  })
+
+  app.get('/getYellowText', async (req, res) => {
+    const { charName } = req.query
+    try {
+      const payload = getYellowText(charName)
+      if (payload) {
+        res.status(200).json({ message: "get yellow text successful", payload: payload })
+      }
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
+  })
+
+  app.post('/parseYellowText', async (req, res) => {
+    const { eqDir } = req.query
+    const success = parseYellowText((eqDir) + "/")
+    if (success === true) {
+      setEqDir(eqDir)
+      const payload = getYellowText('All')
+      if (payload) {
+        res.json({ message: 'Success', payload: payload })
+      }
     }
   })
 

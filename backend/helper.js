@@ -67,16 +67,16 @@ export const determineMissingSpells = (parsedSpells, charClass) => {
 }
 
 // use sepcifically to get the campout location for 'spells' insert
+// bad code smell
 export const campoutHelper = (spellFiles) => {
   
   for (let file of spellFiles) {
     for (let line of file) {
       let campOutLocation = 'unknown';
       const charName = line[2]
-      console.log(charName)
       const result = dbObject.db.prepare("SELECT location FROM campout WHERE charName = ?").get(charName)
-      console.log(result)
-      if (campOutLocation) line.push(campOutLocation)
+      if (result) line.push(result.location)
+      else line.push(campOutLocation)
     }
   }
 }
@@ -120,7 +120,7 @@ export const setClassPrimary = (charName, charClass) => {
   if (rowToDelete) {
     const deleteQuery = dbObject.db.prepare("DELETE FROM charClass WHERE charName = ?")
     deleteQuery.run(rowToDelete.charName)
-    console.log('charClass deleted successfully.')
+    //console.log('charClass deleted successfully.')
   } 
     const insertQuery = dbObject.db.prepare("INSERT INTO charClass (charName, charClass) VALUES (?, ?)")
     insertQuery.run(charName, charClass)
@@ -145,7 +145,7 @@ export const setClassSecondary = (charName, charClass) => {
   const selectecdRow = selectQuery.get(charName)
 
   if (selectecdRow) {
-    console.log(`CHAR CLASS for ${charName} already exists, aborting insert.`)
+    //console.log(`CHAR CLASS for ${charName} already exists, aborting insert.`)
     return;
   } 
     const insertQuery = dbObject.db.prepare("INSERT INTO charClass (charName, charClass) VALUES (?, ?)")
@@ -189,7 +189,6 @@ export const createCharClassMap = () => {
 export const hasClassArmor = (itemName, classArmor) => {
   for (const charName in classArmor) {
     if (itemName in classArmor[charName]) {  
-      console.log(charName)
       return charName
     }
   }
@@ -227,4 +226,24 @@ export const getCharClass = (charName) => {
     console.log(err)
     return 'Unknown'
   }
+}
+
+export const getYellowText = (rawLogFile) => {
+  const processedFile = []
+  const regex = /^\[(.*?)\] \[PvP\] (.*?) <[^>]*> has been defeated by (.*?) <[^>]*> in (.*)!$/;
+  const lines = rawLogFile.split(/\r?\n/)
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
+    const match = line.match(regex)
+    if (match) {
+      const timestamp = match[1];
+      const victim = match[2];
+      const attacker = match[3];
+      const zone = match[4];
+      const yellowText = [timestamp, victim, attacker, zone];
+      processedFile.push(yellowText)
+    }
+  }
+  return processedFile
 }

@@ -13,7 +13,8 @@ import {
     determineMissingSpells, 
     updateSpellCharClass,
     updateItemCharClass,
-    getCampOutLocation
+    getCampOutLocation,
+    getYellowText,
 } from "./helper"
 import fs from 'fs'
 
@@ -126,7 +127,7 @@ export const parseMissingSpellsFiles = (namesArray, eqDir) => {
             const stats = fs.statSync(filePath)
             const createdDate = stats.birthtime.toLocaleString()
             // Boolean to determine if we want to check fir "missing" spells or not
-            const processedFile = processSpellFileLineByLine(name, fileContents, createdDate, false)
+            const processedFile = processSpellFileLineByLine(name, fileContents, createdDate, true)
             processedFiles.push(processedFile)
           }
         }
@@ -236,7 +237,7 @@ export const parseSpellsFiles = (namesArray, eqDir) => {
     const lines = logFile.split(/\r?\n/)
     let charClass = ''
     let maxTally = 0
-  
+    
     // Push line
     let parsedSpells = []
     for (let i = 0; i < lines.length; i++) {
@@ -271,4 +272,41 @@ export const parseSpellsFiles = (namesArray, eqDir) => {
     updateSpellCharClass(charClass, parsedSpells)
     return parsedSpells
   }
+
+export const parseLogFilesYellowText = (namesArray, eqDir) => {
+  const processedFiles = []
+    const logDir = `${eqDir}Logs/`
+    for (let i = 0; i < namesArray.length; i++) {
+      const name = namesArray[i]
+      const filePath = `${logDir}eqlog_${name}_P1999PVP.txt`
+      if (!fs.existsSync(filePath)) {
+        namesArray.splice(i, 1)
+        i--
+        continue
+      }
+      try {
+        if (fs.existsSync(filePath)) {
+          let fileContents = fs.readFileSync(filePath, 'utf-8')
+          if (fileContents) {
+            const processedFile = getYellowText(fileContents)
+            if (processedFile.length !== 0) processedFiles.push(processedFile)
+          }
+        }
+      } catch (err) {
+        console.log('parseLogFilesYellowText (err) block')
+        console.log(err)
+      }
+    }
+    return processedFiles
+}
+
+export const fullYellowTextParse = (eqDir) => {
+  try {
+    const names = getCharNamesFromUi(eqDir)
+    const processedFiles = parseLogFilesYellowText(names, eqDir)
+    if (processedFiles) return processedFiles
+  } catch (err) {
+    console.error('Error:', err)
+  }
+}
   
