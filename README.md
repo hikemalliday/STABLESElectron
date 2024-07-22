@@ -8,6 +8,10 @@ This app makes STABLESPythonGUI obsolete. Does everything that app does, but a m
 
 Built with Electron (react + express). 
 
+FRONTEND: ReactJS (MUI components)
+
+BACKEND: Express + SQLLite (no orms, just strings)
+
 #### Parses:
 
 -  Inventory files
