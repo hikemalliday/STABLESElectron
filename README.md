@@ -2,6 +2,8 @@
 
 #### Inventory file parser + log parser for Everquest.
 
+This app makes STABLESPythonGUI obsolete. Does everything that app does, but a much better gui (electron / react based), and without the feature bloat.
+
 <a href="https://ibb.co/vBb56B5"><img src="https://i.ibb.co/59dDg9D/stables-electron.png" alt="stables-electron" border="0" /></a>
 
 Built with Electron (react + express). 
