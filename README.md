@@ -1,4 +1,4 @@
-# STABLEElectron
+# STABLESElectron
 
 #### Inventory file parser + log parser for Everquest.
 
