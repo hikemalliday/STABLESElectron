@@ -2,7 +2,7 @@
 
 #### Inventory file parser + log parser for Everquest.
 
-![example](https://ibb.co/vBb56B5)
+![example]([url=https://ibb.co/vBb56B5][img]https://i.ibb.co/59dDg9D/stables-electron.png[/img][/url])
 
 Built with Electron (react + express). 
 
