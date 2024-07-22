@@ -20,4 +20,3 @@ Message me for download link, or run:
 `npx electron-vite build`
 `npx electron-builder`
 
-You probably need to install those libs first, idk :)
