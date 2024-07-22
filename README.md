@@ -10,7 +10,7 @@ Built with Electron (react + express).
 
 FRONTEND: ReactJS (MUI components)
 
-BACKEND: Express + SQLLite (no orms, just strings)
+BACKEND: Express + SQLLite (no orm, just strings)
 
 #### Parses:
 
